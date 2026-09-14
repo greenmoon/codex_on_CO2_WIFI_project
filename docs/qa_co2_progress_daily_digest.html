@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V84 2026.09.14 23:41</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V85 2026.09.15 07:14</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details><summary>(087 2026-09-15 07:14) <b>Q:</b> 是否已重新產生可供 iPhone 掃描的 GitHub Pages global Dashboard QR？</summary><p class="answer"><b>A:</b> 是。已重新產生 296×296 的 PNG 與 SVG QR，固定編碼 global index <code>https://greenmoon.github.io/codex_on_CO2_WIFI_project/</code>；global index 會導向 remote iPhone Dashboard。</p><p><b>Evidence / next check：</b>產物為 <code>offline_qr/global/iphone_dashboard.png</code> 與 <code>offline_qr/global/iphone_dashboard.svg</code>，並已完成 PNG 視覺檢查。下一步以實體 iPhone 相機掃描，確認開啟 global Dashboard 後出現 MQTT CO₂ value。</p></details>
 <details><summary>(086 2026-09-14 23:41) <b>Q:</b> GitHub Pages R1.2.1 是否可讓保存舊 `.98` 設定的 Dashboard 自動復原並顯示 CO₂？</summary><p class="answer"><b>A:</b> 是。公開 Dashboard reload 後自動將舊 IP migration 為 <code>jbnas03.synology.me</code>，顯示 <code>WSS subscribed; waiting payload</code>，接著成功收到 MQTT <code>co2</code> telemetry。</p><p><b>Evidence / next check：</b>公開 URL 實測 title=<code>CO₂ Remote WSS Dashboard R1.2.1</code>，endpoint=<code>wss://jbnas03.synology.me:8084/mqtt</code>，畫面顯示 <code>MQTT co2 connected</code>、CO₂ <code>413 ppm</code>、28.7°C、71%、100%、資料年齡 1 秒。下一步以實體 iPhone 掃 global QR 實測相同結果。</p></details>
 <details><summary>(085 2026-09-14 23:36) <b>Q:</b> R1.2 是否修復 remote iPhone Dashboard 的 WSS MQTT subscriber，並可收到 CO₂ value？</summary><p class="answer"><b>A:</b> 是。mqtt.js 已固定為本 repo 的 <code>data/vendor/mqtt.min.js</code>，預設 WSS host 改為憑證相符的 <code>jbnas03.synology.me</code>，port=<code>8084</code>、path=<code>/mqtt</code>；舊 localStorage 的 <code>59.124.7.98</code> 會自動 migration 至新 domain。</p><p><b>Evidence / next check：</b>本機 Dashboard 實測已連到 <code>wss://jbnas03.synology.me:8084/mqtt</code>，狀態為 <code>MQTT co2 connected</code>，收到 CO₂ <code>413 ppm</code>、資料年齡 3 秒。下一步待 GitHub Pages R1.2 建置完成後，以 iPhone QR 開啟 global URL 實測相同結果。</p></details>
 <details><summary>(084 2026-09-14 23:33) <b>Q:</b> GitHub Pages remote Dashboard 為何沒有顯示 CO₂ value？</summary><p class="answer"><b>A:</b> 已確認原預設 endpoint 使用 <code>59.124.7.98</code>，其 TLS certificate CN 為 <code>jbnas03.synology.me</code>；iPhone Safari 因 IP 與憑證名稱不符而無法建立 WSS。runtime 的 <code>window.mqtt</code> 為 <code>undefined</code> 僅代表 library 未掛在 window property，不能單獨作為 subscriber 失敗證據。</p><p><b>Evidence / next check：</b>以標準 WebSocket Upgrade 測試 <code>wss://jbnas03.synology.me:8084/mqtt</code> 取得 <code>HTTP/1.1 101 Switching Protocols</code>。下一步應改為正確 domain，並將 mqtt.js 固定為本 repo 本機資產，避免 iPhone 對 unpkg CDN 的相依；之後以 iPhone 實測收到 <code>co2</code>。</p></details>
@@ -172,6 +173,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V84 — 2026.09.14 23:41</footer>
+<footer>CO2_WIFI Project QA Digest — V85 — 2026.09.15 07:14</footer>
 </body>
 </html>

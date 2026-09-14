@@ -4,7 +4,7 @@
 
 - ESP32-S3 firmware：`src/s3_remote_gateway.cpp`
 - PlatformIO environment：`esp32-s3-remote-gateway`
-- iPhone browser dashboard：`data/remote_iphone_dashboard.html`（R1.2，頁面內會依目前 HTTPS URL 產生分享 QR；預設 WSS 為 `jbnas03.synology.me:8084/mqtt`）
+- iPhone browser dashboard：`data/remote_iphone_dashboard.html`（R1.2.1，頁面內會依目前 HTTPS URL 產生分享 QR；預設 WSS 為 `jbnas03.synology.me:8084/mqtt`，舊 `.98` 設定會自動修正）
 
 ## ESP32-S3 RGB status (R1.1.0)
 

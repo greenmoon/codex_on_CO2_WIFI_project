@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071b2a">
+  <title>CO2_WIFI Dashboard V1.9.0 2026.09.12 15:25</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <nav class="task-line" aria-label="Project stages and versions">
+      <span class="done">S01 AP/Dashboard <b>V1.0.0 ✓</b></span>
+      <span class="done">S02 BLE Scan <b>V1.1.2 ✓</b></span>
+      <span class="done">S03 Decode <b>V1.2.1 ✓</b></span>
+      <span class="done">S04 Bridge <b>V1.3.0 ✓</b></span>
+      <span class="done">S05 Robustness <b>V1.4.3 ✓</b></span>
+      <span class="active">S06 Local MQTT <b>V1.9.0 ●</b></span>
+    </nav>
+    <header>
+      <div>
+        <p class="eyebrow">ESP32-C3 · STAGE 6</p>
+        <h1>CO₂ 空氣儀表板</h1>
+      </div>
+      <div id="connection" class="status connecting"><span></span><strong>連線中</strong></div>
+    </header>
+
+    <section class="qr-panel" aria-labelledby="qr-title">
+      <div class="qr-heading"><div><p>IPHONE QUICK START</p><h2 id="qr-title">掃描兩次即可開啟</h2></div><span>依序 ① → ②</span></div>
+      <div class="qr-grid">
+        <article>
+          <b>① 加入 Wi-Fi</b>
+          <img src="qr_wifi.svg" alt="加入 CO2_WIFI 的 Wi-Fi QR Code" width="220" height="220">
+          <p>SSID <strong>CO2_WIFI</strong></p>
+        </article>
+        <article>
+          <b>② 開啟 Dashboard</b>
+          <img src="qr_dashboard.svg" alt="開啟 192.168.98.1 Dashboard 的 QR Code" width="220" height="220">
+          <p><strong>192.168.98.1</strong></p>
+        </article>
+      </div>
+      <p class="qr-note">請用 iPhone 相機掃描；先接受加入 Wi-Fi，再掃描網址。</p>
+    </section>
+
+    <section class="hero" aria-labelledby="co2-label">
+      <p id="co2-label">二氧化碳濃度</p>
+      <div><strong id="co2">---</strong><span>ppm</span></div>
+      <p id="quality" class="quality">等待資料</p>
+    </section>
+
+    <section class="metrics">
+      <article><p>溫度</p><strong id="temperature">--.-</strong><span>°C</span></article>
+      <article><p>濕度</p><strong id="humidity">--.-</strong><span>%</span></article>
+      <article><p>電池</p><strong id="battery">---</strong><span>%</span></article>
+    </section>
+
+    <section id="heartbeat-card" class="heartbeat-card waiting" aria-label="Live heartbeat and reading cycle">
+      <div class="heartbeat-main"><span class="breathing-led" aria-hidden="true"></span><div><p>LIVE HEARTBEAT</p><strong id="heartbeat-state">WAITING</strong></div></div>
+      <div class="cycle-info"><span>Reading cycle</span><strong id="cycle-period">1000 ms</strong></div>
+      <div class="cycle-track" aria-hidden="true"><span id="cycle-progress"></span></div>
+    </section>
+
+    <section class="system">
+      <div><span>資料來源</span><strong id="source">---</strong></div>
+      <div><span>BLE Scanner</span><strong id="ble">等待掃描</strong></div>
+      <div><span>資料年齡</span><strong id="age">---</strong></div>
+      <div><span>Wi-Fi AP</span><strong>CO2_WIFI</strong></div>
+      <div><span>Bridge</span><strong id="bridge">等待資料</strong></div>
+      <div><span>Clients</span><strong><span id="wifi-clients">0</span> Wi-Fi / <span id="ws-clients">0</span> WS</strong></div>
+      <div><span>Recovery</span><strong id="recovery">NORMAL</strong></div>
+      <div><span>Restarts</span><strong>BLE <span id="ble-restarts">0</span> / AP <span id="ap-restarts">0</span></strong></div>
+      <div><span>Watchdog</span><strong id="watchdog">ACTIVE</strong></div>
+    </section>
+
+    <section class="mqtt-panel" aria-labelledby="mqtt-title">
+      <div class="mqtt-heading"><div><p>LOCAL MQTT PUBLISHER</p><h2 id="mqtt-title">BLE → Router → Broker</h2></div><strong id="mqtt-status" class="mqtt-offline">OFFLINE</strong></div>
+      <dl>
+        <div><dt>Router STA</dt><dd id="sta-status">Connecting</dd></div>
+        <div><dt>STA IP</dt><dd id="sta-ip">---</dd></div>
+        <div><dt>Broker</dt><dd id="mqtt-broker">59.124.7.96:1883</dd></div>
+        <div><dt>Topic</dt><dd id="mqtt-topic">co2</dd></div>
+        <div><dt>Published</dt><dd id="mqtt-count">0</dd></div>
+        <div><dt>Last publish</dt><dd id="mqtt-age">---</dd></div>
+      </dl>
+      <p class="mqtt-rule">New BLE packet → publish · minimum 1000 ms · heartbeat 30000 ms</p>
+    </section>
+
+    <section class="health-panel" aria-labelledby="health-title">
+      <div class="health-heading">
+        <div><p>SYSTEM HEALTH</p><h2 id="health-title">Health Checking</h2></div>
+        <strong id="health-summary" class="health-ok">HEALTHY</strong>
+      </div>
+      <div class="health-columns" aria-hidden="true"><span>ID / TIME</span><span>REASON</span><span>FIXING RESULT</span></div>
+      <ol id="health-history" class="health-history">
+        <li class="health-empty">No failure history</li>
+      </ol>
+      <p class="health-note">Latest first · 最多保留 30 筆於此 iPhone</p>
+    </section>
+
+    <section class="ble-panel">
+      <div class="panel-title"><div><p>BLE CANDIDATE</p><h2 id="ble-name">尚未發現</h2></div><strong id="ble-rssi">--- dBm</strong></div>
+      <dl>
+        <div><dt>Address</dt><dd id="ble-address">---</dd></div>
+        <div><dt>Service UUID</dt><dd id="ble-uuid">---</dd></div>
+        <div><dt>Packets</dt><dd id="ble-count">0</dd></div>
+        <div><dt>BLE age</dt><dd id="ble-age">---</dd></div>
+      </dl>
+      <label>Manufacturer Data</label><code id="ble-manufacturer">---</code>
+      <label>Service Data</label><code id="ble-service-data">---</code>
+      <label>Raw Advertisement Payload</label><code id="ble-raw">---</code>
+    </section>
+
+    <p class="hint">iPhone 請連線至 CO2_WIFI，然後開啟 <strong>192.168.98.1</strong></p>
+    <footer>CO2_WIFI Dashboard · V1.9.0 · 2026.09.12 15:25</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

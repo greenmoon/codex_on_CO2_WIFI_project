@@ -1,0 +1,5 @@
+.pio/
+.venv/
+.DS_Store
+include/secrets.h
+logs/**/*.log

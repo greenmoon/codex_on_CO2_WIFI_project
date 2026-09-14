@@ -1,0 +1,10 @@
+#include <Arduino.h>
+#include <WiFi.h>
+#include "esp_system.h"
+#include "secrets.h"
+constexpr char kVersion[] = "STA_ONLY_V1.3";
+uint32_t lastAttempt=0,retryMs=1000;
+const char* statusText(int s){switch(s){case WL_CONNECTED:return "WL_CONNECTED";case WL_NO_SSID_AVAIL:return "WL_NO_SSID_AVAIL";case WL_CONNECT_FAILED:return "WL_CONNECT_FAILED";case WL_CONNECTION_LOST:return "WL_CONNECTION_LOST";case WL_DISCONNECTED:return "WL_DISCONNECTED";default:return "WL_OTHER";}}
+void scanReport(){int n=WiFi.scanNetworks(false,true);bool f=false;Serial.printf("[STA_ONLY] scan count=%d target=%s\n",n,kRouterSsid);for(int i=0;i<n;++i){bool t=WiFi.SSID(i)==kRouterSsid;f|=t;Serial.printf("[STA_ONLY] ap=%s rssi=%d channel=%d auth=%d target=%d\n",WiFi.SSID(i).c_str(),WiFi.RSSI(i),WiFi.channel(i),(int)WiFi.encryptionType(i),t?1:0);}Serial.printf("[STA_ONLY] scan target_found=%d\n",f?1:0);WiFi.scanDelete();}
+void setup(){Serial.begin(115200);delay(300);Serial.printf("\n[STA_ONLY] firmware=%s ssid=%s reset=%d\n",kVersion,kRouterSsid,(int)esp_reset_reason());WiFi.onEvent([](arduino_event_id_t e,arduino_event_info_t i){Serial.printf("[STA_ONLY] event=%d reason=%d\n",(int)e,(int)i.wifi_sta_disconnected.reason);});WiFi.persistent(false);WiFi.setAutoReconnect(false);WiFi.disconnect(true,true);delay(250);WiFi.mode(WIFI_STA);WiFi.setSleep(true);scanReport();}
+void loop(){uint32_t now=millis();int s=WiFi.status();if(s==WL_CONNECTED){Serial.printf("[STA_ONLY] connected status=%d (%s) ip=%s gateway=%s rssi=%d\n",s,statusText(s),WiFi.localIP().toString().c_str(),WiFi.gatewayIP().toString().c_str(),WiFi.RSSI());delay(5000);return;}if(now-lastAttempt<retryMs){delay(20);return;}lastAttempt=now;Serial.printf("[STA_ONLY] begin status=%d (%s) retry_ms=%lu heap=%u\n",s,statusText(s),(unsigned long)retryMs,ESP.getFreeHeap());WiFi.begin(kRouterSsid,kRouterPassword);Serial.println("[STA_ONLY] begin_returned");delay(15000);s=WiFi.status();Serial.printf("[STA_ONLY] result status=%d (%s)\n",s,statusText(s));if(s!=WL_CONNECTED){retryMs=min<uint32_t>(retryMs*2,30000);WiFi.disconnect(false,false);delay(250);scanReport();}else{retryMs=1000;}}

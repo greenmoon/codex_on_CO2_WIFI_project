@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CO2_WIFI Windows Handoff V1 2026.09.13 22:47</title>
+<style>
+:root{--ink:#173049;--muted:#587086;--blue:#1666b5;--green:#16704a;--line:#cbd8e3;--bg:#f4f8fb}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}.page{max-width:940px;margin:auto;padding:30px 18px 56px}h1{margin:0;font-size:28px}h2{font-size:20px;margin:32px 0 12px}.lead{color:var(--muted);margin-top:6px}.flow{display:flex;align-items:stretch;gap:10px;overflow-x:auto;padding:8px 0}.step{min-width:142px;flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 2px 5px #1730490d}.step b{display:block;color:var(--blue);font-size:14px}.arrow{align-self:center;color:var(--blue);font-size:24px}ol{padding-left:25px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}.ok{border-left:5px solid var(--green)}.warn{border-left:5px solid #c58000}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}code{background:#eaf1f7;padding:1px 5px;border-radius:4px}pre{white-space:pre-wrap;background:#102a43;color:#edf7ff;padding:15px;border-radius:10px;overflow:auto}table{width:100%;border-collapse:collapse;background:#fff}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#eaf3fb}footer{margin-top:36px;color:var(--muted);font-size:13px}@media(max-width:600px){h1{font-size:24px}.arrow{display:none}.flow{display:grid;grid-template-columns:1fr 1fr}.step{min-width:0}}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>CO2_WIFI：Windows Platform Handoff</h1>
+  <p class="lead">從 MacBook 離開後，在 Windows 使用 Dropbox 同步的既有 CO2_WIFI 專案續接。此文件不建立新 project，也不假設 MacBook 本機 chat 會同步。</p>
+
+  <h2>續接流程</h2>
+  <div class="flow">
+    <div class="step"><b>01</b>Windows 啟動 Codex</div><div class="arrow">→</div>
+    <div class="step"><b>02</b>建立 New Chat</div><div class="arrow">→</div>
+    <div class="step"><b>03</b>Open existing folder</div><div class="arrow">→</div>
+    <div class="step"><b>04</b>選 Dropbox CO2_WIFI</div><div class="arrow">→</div>
+    <div class="step"><b>05</b>確認 working directory</div><div class="arrow">→</div>
+    <div class="step"><b>06</b>先讀交接 MD</div>
+  </div>
+
+  <h2>操作步驟</h2>
+  <ol>
+    <li>先等待 Dropbox 在 Windows 同步完成，確認專案含有 <code>AGENTS.md</code>、<code>HANDOFF.md</code>、<code>src/</code>、<code>docs/</code>。</li>
+    <li>開啟 Windows Codex，選擇 <b>New Chat</b>。</li>
+    <li>選擇 <b>Open existing folder</b>，不是 Build New Project。</li>
+    <li>選擇 Dropbox 同步後的 <code>codex_on_CO2_WIFI_project</code> 資料夾。</li>
+    <li>在 Windows Terminal 確認目前 working directory，例如：</li>
+  </ol>
+  <pre>cd C:\Users\&lt;WindowsUser&gt;\Dropbox\0DownLoad\codex_on_CO2_WIFI_project
+pwd</pre>
+  <div class="card ok"><b>正確結果：</b>顯示 Windows 的專案路徑。它不會與 Mac 的 <code>/Users/...</code> 相同，但最後資料夾必須是 <code>codex_on_CO2_WIFI_project</code>。</div>
+
+  <h2>第一段交接提示</h2>
+  <pre>這是既有 Dropbox 同步專案，不要建立新 project。
+請確認目前 working directory 是 codex_on_CO2_WIFI_project。
+先讀取 AGENTS.md、HANDOFF.md、docs/qa_co2_progress_daily_digest.html。
+先摘要目前版本、已驗證事項、未完成項目與 Windows 下一步；
+不要修改檔案，等待我說 go。</pre>
+
+  <h2>文件角色</h2>
+  <table><thead><tr><th>文件</th><th>Windows 新 task 可取得的內容</th></tr></thead><tbody>
+    <tr><td><code>AGENTS.md</code></td><td>專案規則、QA 記錄方式、驗證與交接要求。</td></tr>
+    <tr><td><code>HANDOFF.md</code></td><td>最新版本、Gateway/Bridge 架構、T1–T5 LED 實測、Windows bridge 下一步。</td></tr>
+    <tr><td><code>docs/qa_co2_progress_daily_digest.html</code></td><td>已驗證設計、RCA、時間序與下一步證據。</td></tr>
+  </tbody></table>
+
+  <div class="card warn"><b>限制：</b>Windows New Chat 不會自動取得 MacBook 本機 task 的逐字 chat、Terminal 畫面、USB serial port 或正在運行的 bridge process。重要工程結論以 Markdown 與 QA Digest 為準。</div>
+
+  <h2>Windows Bridge（需要時）</h2>
+  <p>先閱讀 <code>platform/windows/README.md</code>，再執行：</p>
+  <pre>py -3 -m pip install --user paho-mqtt
+powershell -ExecutionPolicy Bypass -File .\tools\windows\start_mqtt_bridge.ps1
+curl http://127.0.0.1:8080/api/co2</pre>
+  <p>以 Windows Wi-Fi IPv4 重新產生 QR，保存於 <code>offline_qr/windows/</code>，確認後複製至 <code>offline_qr/current/</code>。</p>
+  <footer>CO2_WIFI Windows Handoff · V1 · 2026.09.13 22:47</footer>
+</main>
+</body>
+</html>

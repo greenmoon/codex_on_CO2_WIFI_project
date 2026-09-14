@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V80 2026.09.14 23:24</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V81 2026.09.14 23:29</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details><summary>(083 2026-09-14 23:29) <b>Q:</b> CO2_WIFI 是否已完成 GitHub Pages global index 發布並可供 iPhone 存取？</summary><p class="answer"><b>A:</b> 是。已建立公開 GitHub repository <code>greenmoon/codex_on_CO2_WIFI_project</code>、啟用 <code>main</code> branch root 的 GitHub Pages 與 HTTPS 強制模式。global index 會導向 remote iPhone Dashboard；global QR 已輸出於 <code>offline_qr/global/</code>。</p><p><b>Evidence / next check：</b>GitHub Pages status=<code>built</code>，<code>https://greenmoon.github.io/codex_on_CO2_WIFI_project/</code> 與 <code>/data/remote_iphone_dashboard.html</code> 均回傳 HTTP 200。仍需設定 broker 的有效 WSS TLS domain、port 與 path，再以 iPhone 訂閱 <code>co2</code> 實測。</p></details>
 <details><summary>(082 2026-09-14 23:24) <b>Q:</b> 是否可直接執行 global index publish flow 到 GitHub Pages？</summary><p class="answer"><b>A:</b> 尚不可。專案根目錄執行 Git 檢查時回報 <code>fatal: not a git repository</code>，目前沒有 Git branch、remote 或既有 GitHub Pages repository target。</p><p><b>Evidence / next check：</b>已確認根目錄只有本機 <code>data/index.html</code>，無 <code>.git</code>。需要使用者提供既有 GitHub repository URL，或明確授權在此資料夾初始化 Git repository、設定 remote 並建立 GitHub Pages 發布流程後，才能執行 <code>gi</code>。</p></details>
 <details><summary>(081 2026-09-14 23:18) <b>Q:</b> 本機主 Dashboard index flow 是否可完成基本結構檢查？</summary><p class="answer"><b>A:</b> 是。<code>data/index.html</code> HTML parser check 通過，實際 title 為 <code>CO2_WIFI Dashboard V1.9.0 2026.09.12 15:25</code>。</p><p><b>Evidence / next check：</b>本次為檔案結構與本機 index flow 檢查；未宣稱 iPhone、BLE、STA 或 MQTT 的實機狀態。若需要遠端 iPhone-only 驗證，應改檢查 <code>remote_iphone_dashboard.html</code> 的 HTTPS/WSS 部署。</p></details>
 <details><summary>(080 2026-09-14 23:10) <b>Q:</b> ESP32-S3 R1.1.0 的實體 RGB 事件順序是否已實機驗證？</summary><p class="answer"><b>A:</b> 是。使用者確認實際 CO₂ BLE packet 到達後，RGB 依序顯示藍色（BLE read）→ 青色（payload pack）→ 綠色（MQTT publish），符合設計規則。</p><p><b>Evidence / next check：</b>使用者實機回報「藍 → 青 → 綠 RGB 順序 ok」。後續可選擇在 MQTT broker 暫時中斷時，補驗紅色 publish-failed 600 ms 指示。</p></details>
@@ -168,6 +169,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V80 — 2026.09.14 23:24</footer>
+<footer>CO2_WIFI Project QA Digest — V81 — 2026.09.14 23:29</footer>
 </body>
 </html>

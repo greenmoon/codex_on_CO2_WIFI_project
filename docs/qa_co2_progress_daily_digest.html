@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V37 2026.09.27 21:22</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V38 2026.09.27 21:34</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(039 2026-09-27 21:34) <b>Q:</b> 為何 MacBook 仍每約 10 秒發出一聲 beep，如何完全移除？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.6</code> 已完全移除 beep／Web Audio demo、Sound 卡片、oscillator、alarm pattern 與每筆 payload 的 <code>playAlarm()</code> 呼叫，只保留中文 Voice Alert。RCA 是 MacBook 仍開著的舊版 Dashboard 分頁在每筆約 10 秒 MQTT payload 後執行 beep；800–999 ppm 規則正好是一聲，iPhone 並未發聲。</p>
+<p><b>Evidence / next check：</b>已確認新版 Dashboard source 不再包含 <code>AudioContext</code>、<code>Oscillator</code>、<code>playAlarm</code>、<code>sound-toggle</code> 或 <code>sound-card</code>；HTML／JavaScript 語法與 Voice interval 邊界測試仍通過。發布後需在 MacBook 關閉舊分頁或強制重新載入 R1.3.6，連續觀察至少 30 秒確認沒有 beep；iPhone Voice Alert 功能保持不變。</p>
+</details>
 <details>
 <summary>(038 2026-09-27 21:22) <b>Q:</b> Voice Alert 如何依 CO₂ 風險切換靜音、30 秒與 10 秒週期？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.5</code> 已改為 0–799 ppm 定時語音靜音、800–1999 ppm 每 30 秒播報、≥2000 ppm 每 10 秒播報；Voice 卡片會依目前真實 CO₂ 顯示 <code>Silent</code>、<code>30 sec</code> 或 <code>10 sec</code>。</p>
@@ -208,6 +213,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V37 — 2026-09-27 21:22</footer>
+<footer>CO2_WIFI Project QA Digest — V38 — 2026-09-27 21:34</footer>
 </body>
 </html>

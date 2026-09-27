@@ -1,11 +1,20 @@
 <!doctype html>
 <html lang="zh-Hant">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO₂ Remote WSS Dashboard R1.3.2</title>
+<meta name="theme-color" content="#315847">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CO₂ Dashboard">
+<link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png?v=R1.3.3">
+<link rel="manifest" href="../manifest.webmanifest?v=R1.3.3">
+<title>CO₂ Remote WSS Dashboard R1.3.3</title>
 <style>
 :root{color-scheme:light;--bg:#e5e2d9;--screen:#bcb8ad;--ink:#121212;--green:#187548;--yellow:#946400;--red:#b42626}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,sans-serif;color:var(--ink);text-align:center}.meter{max-width:430px;margin:20px auto;padding:20px;border:10px solid #f8f7f1;border-radius:28px;background:var(--screen);box-shadow:0 5px 18px #0004}.top{font:25px ui-monospace,monospace;text-align:right}.rule{height:4px;background:#3e564a;margin:10px}.co2{font:88px ui-monospace,monospace;line-height:1}.unit{font-size:18px}.age{margin:12px 0}.row{display:flex;justify-content:space-around;font-size:29px}.label{font-size:13px}.status{font-weight:700;margin:18px 0 7px}.led{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:6px;vertical-align:middle}.green{color:var(--green)}.green .led{background:#21c66a;animation:flash .6s ease-out}.yellow{color:var(--yellow)}.yellow .led{background:#e5b41a;animation:pulse 1.8s infinite}.red{color:var(--red)}.red .led{background:#e33d3d;animation:blink .8s infinite}@keyframes flash{0%{box-shadow:0 0 0 0 #21c66a;opacity:.3}50%{box-shadow:0 0 18px 8px #21c66a;opacity:1}100%{box-shadow:0 0 0 0 #21c66a}}@keyframes pulse{50%{opacity:.3}}@keyframes blink{50%{opacity:.15}}details,.share,.sound-card{max-width:430px;margin:16px auto;text-align:left;padding:0 18px}input{width:100%;padding:9px;margin:5px 0;border:1px solid #9ca8a0;border-radius:6px;background:#fff}button,.open-link{width:100%;padding:11px;background:#185f9d;color:#fff;border:0;border-radius:8px;font-weight:700}.small{font-size:12px;color:#485458;word-break:break-all}.source{margin-top:8px}.share{padding:14px;text-align:center}.share h2,.sound-card h2{margin:0;font-size:17px}.qr{display:block;width:280px;height:280px;margin:14px auto;background:#fff;border-radius:10px;overflow:hidden}.qr img{display:block;width:100%;height:100%;image-rendering:pixelated}.open-link{display:block;text-decoration:none;margin:8px 0}.copy{background:#46515a;margin-top:8px}.sound-card{padding:16px;border:1px solid #c8c4ba;border-radius:16px;background:#f5f2ea}.sound-card button[aria-pressed="true"]{background:#a42828}.sound-state{margin:9px 0 0;text-align:center;font-size:13px;color:#485458}.sound-rules{margin:10px 0 0;padding-left:22px;font-size:12px;line-height:1.55;color:#485458}.versions{margin:28px auto 18px;padding:0 12px;color:#73736f;font-size:10px;line-height:1.5;letter-spacing:.02em;max-width:620px}
 </style>
+</head>
+<body>
 <main class="meter">
   <div class="top" id="clock">--:--</div><div class="rule"></div>
   <div class="co2" id="co2">---</div><div class="unit">ppm CO₂</div>
@@ -27,7 +36,7 @@
 </section>
 <section class="share" aria-label="分享 Dashboard">
   <h2>分享此 Dashboard</h2>
-  <a class="qr" href="https://greenmoon.github.io/codex_on_CO2_WIFI_project/" aria-label="Open CO2 Dashboard"><img src="../offline_qr/global/iphone_dashboard.png?v=R1.3.2" width="360" height="360" alt="QR code for CO2 Global Dashboard"></a>
+  <a class="qr" href="https://greenmoon.github.io/codex_on_CO2_WIFI_project/" aria-label="Open CO2 Dashboard"><img src="../offline_qr/global/iphone_dashboard.png?v=R1.3.3" width="360" height="360" alt="QR code for CO2 Global Dashboard"></a>
   <p class="small" id="share-url">https://greenmoon.github.io/codex_on_CO2_WIFI_project/</p>
   <a class="open-link" href="https://greenmoon.github.io/codex_on_CO2_WIFI_project/">Open Dashboard</a>
   <button class="copy" id="copy-url">Copy Dashboard URL</button>
@@ -41,11 +50,11 @@
   <button id="connect">Connect WSS MQTT</button>
   <p class="small" id="endpoint"></p>
 </details>
-<footer class="versions" id="versions">FW -- · Dashboard R1.3.2 · Payload Schema -- · MQTT/WSS R1</footer>
+<footer class="versions" id="versions">FW -- · Dashboard R1.3.3 · Payload Schema -- · MQTT/WSS R1</footer>
 <script src="vendor/mqtt.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const DASHBOARD_VERSION='R1.3.2';
+const DASHBOARD_VERSION='R1.3.3';
 const SHARE_URL='https://greenmoon.github.io/codex_on_CO2_WIFI_project/';
 const EXPECTED_DEVICE='co2s3-remote-14c19f508e10';
 const TOPIC=`co2/${EXPECTED_DEVICE}/telemetry`;
@@ -73,4 +82,5 @@ function connect(){if(client)client.end(true);clearReading();const rawHost=$('ho
 setInterval(()=>{const age=lastReceived?Date.now()-lastReceived:null;$('age').textContent=age==null?'等待指定 ESP32-S3...':Math.round(age/1000)+' seconds ago';if(age!==null&&age>FRESH_MS&&client?.connected){state('yellow','S3 payload stale');stopAlarm();$('sound-state').textContent=soundEnabled?'Sound paused: stale payload':'Sound disabled';}},1000);
 try{const c=JSON.parse(localStorage.getItem('co2-wss-config'));if(c){if(c.host==='59.124.7.98')c.host=kDefaultWss.host;$('host').value=c.host||kDefaultWss.host;$('port').value=c.port||kDefaultWss.port;$('path').value=c.path||kDefaultWss.path;}}catch(_){}$('device').value=EXPECTED_DEVICE;$('topic').value=TOPIC;$('connect').onclick=connect;connect();
 </script>
+</body>
 </html>

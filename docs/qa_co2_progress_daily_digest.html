@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V34 2026.09.27 20:37</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V35 2026.09.27 20:47</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(036 2026-09-27 20:47) <b>Q:</b> 如何讓 Global Dashboard 加入 iPhone 主畫面時顯示專用 App 圖示？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.3</code> 已新增 180×180 Apple Touch Icon、192×192／512×512 PWA PNG、Web App Manifest 與 iOS standalone metadata。圖示採暖白底、深綠 CO₂、809 示意數值、Wi-Fi 與綠色 LIVE，名稱為 <code>CO₂ Dashboard</code>。</p>
+<p><b>Evidence / next check：</b>已確認三個 PNG 尺寸、manifest JSON 語法與 HTML icon／manifest 路徑；Global Pages 發布後仍需在實體 iPhone Safari 先刪除舊主畫面捷徑，再重新使用「分享 → 加入主畫面」，確認新圖示與名稱。此捷徑用於啟動網頁，不代表 iOS 允許 Dashboard 永久背景執行。</p>
+</details>
 <details>
 <summary>(035 2026-09-27 20:37) <b>Q:</b> 為何 MacBook 有警報聲但 iPhone Safari 沒有，如何改成預設啟用？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.2</code> 已將聲音改為預設 Enable。RCA 是 iPhone Safari 的 autoplay policy：即使頁面邏輯啟用聲音，Web Audio 仍必須先由使用者觸控解鎖。新版在頁面任意第一次觸控時自動建立／resume AudioContext，之後每筆有效新 payload 才依 CO₂ 級距播放；使用者仍可用按鈕 Disable。</p>
@@ -193,6 +198,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V34 — 2026-09-27 20:37</footer>
+<footer>CO2_WIFI Project QA Digest — V35 — 2026-09-27 20:47</footer>
 </body>
 </html>

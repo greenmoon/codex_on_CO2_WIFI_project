@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V32 2026.09.27 16:42</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V33 2026.09.27 20:21</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(034 2026-09-27 20:21) <b>Q:</b> 如何提升 Dashboard QR 掃描可靠度，並套用新版 CO₂ 聲音級距？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.1</code> 已改用固定短 URL <code>https://greenmoon.github.io/codex_on_CO2_WIFI_project/</code>，QR 採 error correction Q、4-module quiet zone、8 px/module 與純黑白輸出；PNG 實際為 360×360，頁面以 280×280 顯示。聲音規則同步更新為 0–799 ppm 靜音、800–999 ppm 1 聲 × 1 秒、1000–1999 ppm 2 聲 × 1 秒、2000–2999 ppm 5 聲 × 1 秒、≥3000 ppm 10 聲 × 0.5 秒，每筆有效新 payload 觸發一次 pattern。</p>
+<p><b>Evidence / next check：</b>已移除頁面對外部 QR JavaScript CDN 的依賴，改為直接引用同 repo 的靜態 PNG，並新增可點擊的 <code>Open Dashboard</code> 與固定 URL Copy。PNG／SVG 均由 qrencode 4.1.1 重新產生，SVG viewBox 為 45×45、pattern offset 為 4，證明 quiet zone 為 4 modules；下一步仍需以第二支實體 iPhone 相機掃描，並用模擬／實際跨級 payload 驗證音數與音長。</p>
+</details>
 <details>
 <summary>(033 2026-09-27 16:42) <b>Q:</b> 如何排除 Global Dashboard 非預期的 647 ppm，並加入 10 秒更新、聲音警報與低調版本列？</summary>
 <p class="answer"><b>A:</b> 已完成 Firmware／Dashboard <code>R1.3.0</code>。RCA 實測時 Global Dashboard 顯示 647 ppm，但同時間 S3 Serial 為 589 ppm 且 <code>sta=1、mqtt=0、pub=0</code>，證明 647 來自共用 <code>co2</code> topic 的其他 publisher。新版改用專用 topic <code>co2/co2s3-remote-14c19f508e10/telemetry</code>，Dashboard 固定驗證 device ID、schema 2、遞增 sequence、非 retained、有效旗標與資料年齡；Firmware 每 10 秒最多發布一筆新的 BLE reading。</p>
@@ -183,6 +188,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V32 — 2026-09-27 16:42</footer>
+<footer>CO2_WIFI Project QA Digest — V33 — 2026-09-27 20:21</footer>
 </body>
 </html>

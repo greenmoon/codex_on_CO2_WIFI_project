@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO₂ Remote WSS Dashboard R1.3.1</title>
+<title>CO₂ Remote WSS Dashboard R1.3.2</title>
 <style>
 :root{color-scheme:light;--bg:#e5e2d9;--screen:#bcb8ad;--ink:#121212;--green:#187548;--yellow:#946400;--red:#b42626}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,sans-serif;color:var(--ink);text-align:center}.meter{max-width:430px;margin:20px auto;padding:20px;border:10px solid #f8f7f1;border-radius:28px;background:var(--screen);box-shadow:0 5px 18px #0004}.top{font:25px ui-monospace,monospace;text-align:right}.rule{height:4px;background:#3e564a;margin:10px}.co2{font:88px ui-monospace,monospace;line-height:1}.unit{font-size:18px}.age{margin:12px 0}.row{display:flex;justify-content:space-around;font-size:29px}.label{font-size:13px}.status{font-weight:700;margin:18px 0 7px}.led{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:6px;vertical-align:middle}.green{color:var(--green)}.green .led{background:#21c66a;animation:flash .6s ease-out}.yellow{color:var(--yellow)}.yellow .led{background:#e5b41a;animation:pulse 1.8s infinite}.red{color:var(--red)}.red .led{background:#e33d3d;animation:blink .8s infinite}@keyframes flash{0%{box-shadow:0 0 0 0 #21c66a;opacity:.3}50%{box-shadow:0 0 18px 8px #21c66a;opacity:1}100%{box-shadow:0 0 0 0 #21c66a}}@keyframes pulse{50%{opacity:.3}}@keyframes blink{50%{opacity:.15}}details,.share,.sound-card{max-width:430px;margin:16px auto;text-align:left;padding:0 18px}input{width:100%;padding:9px;margin:5px 0;border:1px solid #9ca8a0;border-radius:6px;background:#fff}button,.open-link{width:100%;padding:11px;background:#185f9d;color:#fff;border:0;border-radius:8px;font-weight:700}.small{font-size:12px;color:#485458;word-break:break-all}.source{margin-top:8px}.share{padding:14px;text-align:center}.share h2,.sound-card h2{margin:0;font-size:17px}.qr{display:block;width:280px;height:280px;margin:14px auto;background:#fff;border-radius:10px;overflow:hidden}.qr img{display:block;width:100%;height:100%;image-rendering:pixelated}.open-link{display:block;text-decoration:none;margin:8px 0}.copy{background:#46515a;margin-top:8px}.sound-card{padding:16px;border:1px solid #c8c4ba;border-radius:16px;background:#f5f2ea}.sound-card button[aria-pressed="true"]{background:#a42828}.sound-state{margin:9px 0 0;text-align:center;font-size:13px;color:#485458}.sound-rules{margin:10px 0 0;padding-left:22px;font-size:12px;line-height:1.55;color:#485458}.versions{margin:28px auto 18px;padding:0 12px;color:#73736f;font-size:10px;line-height:1.5;letter-spacing:.02em;max-width:620px}
 </style>
@@ -17,8 +17,8 @@
 </main>
 <section class="sound-card" aria-label="CO2 sound alarm">
   <h2>CO₂ 聲音警報</h2>
-  <button id="sound-toggle" type="button" aria-pressed="false">🔊 Enable Sound</button>
-  <p class="sound-state" id="sound-state">Sound disabled</p>
+  <button id="sound-toggle" type="button" aria-pressed="true">🔇 Disable Sound</button>
+  <p class="sound-state" id="sound-state">Sound enabled; tap screen once to arm iPhone audio</p>
   <ul class="sound-rules">
     <li>0–799 ppm：靜音</li><li>800–999 ppm：1 聲 × 1 秒</li>
     <li>1000–1999 ppm：2 聲 × 1 秒</li><li>2000–2999 ppm：5 聲 × 1 秒</li>
@@ -27,7 +27,7 @@
 </section>
 <section class="share" aria-label="分享 Dashboard">
   <h2>分享此 Dashboard</h2>
-  <a class="qr" href="https://greenmoon.github.io/codex_on_CO2_WIFI_project/" aria-label="Open CO2 Dashboard"><img src="../offline_qr/global/iphone_dashboard.png?v=R1.3.1" width="360" height="360" alt="QR code for CO2 Global Dashboard"></a>
+  <a class="qr" href="https://greenmoon.github.io/codex_on_CO2_WIFI_project/" aria-label="Open CO2 Dashboard"><img src="../offline_qr/global/iphone_dashboard.png?v=R1.3.2" width="360" height="360" alt="QR code for CO2 Global Dashboard"></a>
   <p class="small" id="share-url">https://greenmoon.github.io/codex_on_CO2_WIFI_project/</p>
   <a class="open-link" href="https://greenmoon.github.io/codex_on_CO2_WIFI_project/">Open Dashboard</a>
   <button class="copy" id="copy-url">Copy Dashboard URL</button>
@@ -41,18 +41,18 @@
   <button id="connect">Connect WSS MQTT</button>
   <p class="small" id="endpoint"></p>
 </details>
-<footer class="versions" id="versions">FW -- · Dashboard R1.3.1 · Payload Schema -- · MQTT/WSS R1</footer>
+<footer class="versions" id="versions">FW -- · Dashboard R1.3.2 · Payload Schema -- · MQTT/WSS R1</footer>
 <script src="vendor/mqtt.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const DASHBOARD_VERSION='R1.3.1';
+const DASHBOARD_VERSION='R1.3.2';
 const SHARE_URL='https://greenmoon.github.io/codex_on_CO2_WIFI_project/';
 const EXPECTED_DEVICE='co2s3-remote-14c19f508e10';
 const TOPIC=`co2/${EXPECTED_DEVICE}/telemetry`;
 const FRESH_MS=16000;
 const kDefaultWss={host:'jbnas03.synology.me',port:8084,path:'/mqtt'};
 let client,lastReceived=0,lastSeq=null,lastUptime=null,lastCo2=null,audioContext=null,activeTones=[];
-let soundEnabled=false;
+let soundEnabled=true;
 
 function clock(){$('clock').textContent=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});}setInterval(clock,1000);clock();
 $('copy-url').onclick=async()=>{try{await navigator.clipboard.writeText(SHARE_URL);$('copy-url').textContent='Copied';setTimeout(()=>$('copy-url').textContent='Copy Dashboard URL',1200);}catch(_){$('copy-url').textContent='Copy failed';}};
@@ -61,9 +61,12 @@ function clearReading(){lastReceived=0;lastSeq=null;lastUptime=null;lastCo2=null
 function stopAlarm(){for(const tone of activeTones){try{tone.stop();}catch(_){}}activeTones=[];}
 async function unlockAudio(){const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)throw new Error('Web Audio unavailable');audioContext??=new AudioCtx();if(audioContext.state==='suspended')await audioContext.resume();}
 function alarmPattern(ppm){if(ppm<800)return {label:'Normal: silent (0–799 ppm)',durations:[],gap:0};if(ppm<1000)return {label:'Warning: 1 × 1s',durations:[1000],gap:0};if(ppm<2000)return {label:'High warning: 2 × 1s',durations:[1000,1000],gap:350};if(ppm<3000)return {label:'High warning: 5 × 1s',durations:Array(5).fill(1000),gap:350};return {label:'Danger: 10 × 0.5s',durations:Array(10).fill(500),gap:500};}
-function playAlarm(ppm){stopAlarm();const pattern=alarmPattern(ppm);$('sound-state').textContent=soundEnabled?pattern.label:'Sound disabled';if(!soundEnabled||!audioContext||!pattern.durations.length)return;let offset=0;for(const duration of pattern.durations){const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),start=audioContext.currentTime+offset/1000,end=start+duration/1000;oscillator.type='sine';oscillator.frequency.value=880;gain.gain.setValueAtTime(0.0001,start);gain.gain.exponentialRampToValueAtTime(0.13,start+0.025);gain.gain.setValueAtTime(0.13,Math.max(start+0.025,end-0.04));gain.gain.exponentialRampToValueAtTime(0.0001,end);oscillator.connect(gain).connect(audioContext.destination);oscillator.start(start);oscillator.stop(end+0.02);activeTones.push(oscillator);offset+=duration+pattern.gap;}}
-function renderSoundButton(){$('sound-toggle').setAttribute('aria-pressed',String(soundEnabled));$('sound-toggle').textContent=soundEnabled?'🔇 Disable Sound':'🔊 Enable Sound';$('sound-state').textContent=soundEnabled?(lastCo2==null?'Sound enabled; waiting fresh payload':alarmPattern(lastCo2).label):'Sound disabled';}
-$('sound-toggle').onclick=async()=>{if(!soundEnabled){try{await unlockAudio();soundEnabled=true;}catch(e){$('sound-state').textContent=e.message;return;}}else{soundEnabled=false;stopAlarm();}renderSoundButton();if(soundEnabled&&lastReceived&&Date.now()-lastReceived<=FRESH_MS)playAlarm(lastCo2);};renderSoundButton();
+function playAlarm(ppm){stopAlarm();const pattern=alarmPattern(ppm);if(!soundEnabled){$('sound-state').textContent='Sound disabled';return;}if(!audioContext||audioContext.state!=='running'){$('sound-state').textContent='Sound enabled; tap screen once to arm iPhone audio';return;}$('sound-state').textContent=pattern.label;if(!pattern.durations.length)return;let offset=0;for(const duration of pattern.durations){const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),start=audioContext.currentTime+offset/1000,end=start+duration/1000;oscillator.type='sine';oscillator.frequency.value=880;gain.gain.setValueAtTime(0.0001,start);gain.gain.exponentialRampToValueAtTime(0.13,start+0.025);gain.gain.setValueAtTime(0.13,Math.max(start+0.025,end-0.04));gain.gain.exponentialRampToValueAtTime(0.0001,end);oscillator.connect(gain).connect(audioContext.destination);oscillator.start(start);oscillator.stop(end+0.02);activeTones.push(oscillator);offset+=duration+pattern.gap;}}
+function renderSoundButton(){$('sound-toggle').setAttribute('aria-pressed',String(soundEnabled));$('sound-toggle').textContent=soundEnabled?'🔇 Disable Sound':'🔊 Enable Sound';if(!soundEnabled)$('sound-state').textContent='Sound disabled';else if(!audioContext||audioContext.state!=='running')$('sound-state').textContent='Sound enabled; tap screen once to arm iPhone audio';else $('sound-state').textContent=lastCo2==null?'Sound armed; waiting fresh payload':alarmPattern(lastCo2).label;}
+async function armSoundFromGesture(){if(!soundEnabled||audioContext?.state==='running')return;try{await unlockAudio();renderSoundButton();if(lastReceived&&Date.now()-lastReceived<=FRESH_MS)playAlarm(lastCo2);}catch(e){$('sound-state').textContent=e.message;}}
+document.addEventListener('pointerdown',armSoundFromGesture,{passive:true});
+document.addEventListener('touchstart',armSoundFromGesture,{passive:true});
+$('sound-toggle').onclick=async()=>{if(soundEnabled){soundEnabled=false;stopAlarm();renderSoundButton();return;}soundEnabled=true;try{await unlockAudio();}catch(e){$('sound-state').textContent=e.message;return;}renderSoundButton();if(lastReceived&&Date.now()-lastReceived<=FRESH_MS)playAlarm(lastCo2);};renderSoundButton();
 function validPayload(d,packet){const co2=Number(d.co2_ppm),seq=Number(d.seq),uptime=Number(d.uptime_ms),age=Number(d.sensor_age_ms);if(packet?.retain)return false;if(d.device_id!==EXPECTED_DEVICE||d.sensor_data_valid!==true||Number(d.schema)!==2)return false;if(!Number.isFinite(co2)||co2<250||co2>10000||!Number.isFinite(seq)||!Number.isFinite(uptime)||!Number.isFinite(age)||age>15000)return false;const rebooted=lastUptime!==null&&uptime<lastUptime;if(!rebooted&&lastSeq!==null&&seq<=lastSeq)return false;return true;}
 function acceptPayload(d){lastReceived=Date.now();lastSeq=Number(d.seq);lastUptime=Number(d.uptime_ms);lastCo2=Number(d.co2_ppm);$('co2').textContent=Math.round(lastCo2);$('temp').textContent=Number(d.temperature_c).toFixed(1);$('hum').textContent=Math.round(Number(d.humidity_pct));$('bat').textContent=Math.round(Number(d.battery_pct));$('received').textContent='最後收到：'+new Date(lastReceived).toLocaleString('zh-TW',{hour12:false});$('source').textContent=`來源：${d.device_id} · seq ${lastSeq}`;$('versions').textContent=`FW ${d.firmware_version||'--'} · Dashboard ${DASHBOARD_VERSION} · Payload Schema ${d.schema} · MQTT/WSS R1`;state('green','MQTT S3 telemetry connected');playAlarm(lastCo2);}
 function connect(){if(client)client.end(true);clearReading();const rawHost=$('host').value.trim(),host=rawHost==='59.124.7.98'?kDefaultWss.host:rawHost,port=Number($('port').value),path=$('path').value.trim()||'/mqtt';if(host!==rawHost)$('host').value=host;const url=`wss://${host}:${port}${path}`;$('endpoint').textContent=url+'  topic: '+TOPIC;localStorage.setItem('co2-wss-config',JSON.stringify({host,port,path}));if(typeof mqtt==='undefined'){state('red','MQTT library unavailable');return;}state('yellow','WSS connecting');client=mqtt.connect(url,{clientId:'iphone-co2-'+Math.random().toString(16).slice(2),clean:true,reconnectPeriod:2000,connectTimeout:8000});client.on('connect',()=>{client.subscribe(TOPIC,{qos:0},err=>state(err?'red':'yellow',err?'Subscribe failed':'WSS subscribed; waiting S3'));});client.on('message',(topic,bytes,packet)=>{try{const d=JSON.parse(bytes.toString());if(topic!==TOPIC||!validPayload(d,packet))return;acceptPayload(d);}catch(_){state('red','Invalid JSON payload');stopAlarm();}});client.on('error',()=>{state('red','WSS connection error');stopAlarm();});client.on('offline',()=>{state('red','WSS offline');stopAlarm();});client.on('close',()=>{state('red','WSS disconnected');stopAlarm();});}

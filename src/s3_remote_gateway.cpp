@@ -2,6 +2,12 @@
 // Data flow: CO2 BLE advertising -> ESP32-S3 -> MQTT TCP publish -> broker WSS -> iPhone.
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#ifndef CO2_ENABLE_OTA
+#define CO2_ENABLE_OTA 0
+#endif
+#if CO2_ENABLE_OTA
+#include <ArduinoOTA.h>
+#endif
 #include <PubSubClient.h>
 #include <WiFi.h>
 #include <algorithm>
@@ -10,15 +16,14 @@
 #include "secrets.h"
 
 namespace {
-constexpr char kFirmwareVersion[] = "R1.1.0";
+constexpr char kFirmwareVersion[] = "R1.3.0";
 constexpr char kBroker[] = "59.124.7.98";
 constexpr uint16_t kBrokerPort = 1883;
-constexpr char kTopic[] = "co2";
-constexpr uint8_t kRouterChannel = 6;
 constexpr uint32_t kWiFiAttemptTimeoutMs = 15000;
 constexpr uint32_t kReconnectMaxMs = 30000;
-constexpr uint32_t kPublishIntervalMs = 5000;
-constexpr uint32_t kHeartbeatIntervalMs = 30000;
+constexpr uint32_t kBleInitialWifiWaitMs = 45000;
+constexpr uint32_t kPublishIntervalMs = 10000;
+constexpr uint32_t kSensorFreshMaxMs = 15000;
 constexpr uint32_t kDebugIntervalMs = 5000;
 // ESP32-S3-DevKitC-1 boards with the standard addressable RGB LED use GPIO48.
 // Change only this value if the connected S3 board routes its RGB LED elsewhere.
@@ -42,6 +47,10 @@ enum class RgbSignal : uint8_t {
   PAYLOAD_READY,
   MQTT_PUBLISHED,
   MQTT_FAILED,
+#if CO2_ENABLE_OTA
+  OTA_READY,
+  OTA_FAILED,
+#endif
 };
 
 WiFiClient network;
@@ -61,6 +70,14 @@ uint32_t wifiRetryMs = 1000;
 uint32_t lastMqttAttemptMs = 0;
 uint32_t mqttRetryMs = 1000;
 bool wifiConnecting = false;
+String mqttTopic;
+#if CO2_ENABLE_OTA
+volatile bool otaInProgress = false;
+bool otaReady = false;
+String otaHostname;
+#else
+constexpr bool otaInProgress = false;
+#endif
 
 void enqueueRgb(RgbSignal signal) {
   if (rgbQueue != nullptr) xQueueSend(rgbQueue, &signal, 0);
@@ -74,7 +91,20 @@ void rgbTask(void *) {
 
   for (;;) {
     RgbSignal signal{};
-    if (xQueueReceive(rgbQueue, &signal, portMAX_DELAY) != pdTRUE) continue;
+    if (xQueueReceive(rgbQueue, &signal, pdMS_TO_TICKS(30)) != pdTRUE) {
+#if CO2_ENABLE_OTA
+      if (otaInProgress) {
+      static uint8_t otaLevel = 2;
+      static int8_t otaStep = 2;
+      otaLevel = static_cast<uint8_t>(otaLevel + otaStep);
+      if (otaLevel >= 30) otaStep = -2;
+      if (otaLevel <= 2) otaStep = 2;
+      rgbLed.setPixelColor(0, rgbLed.Color(otaLevel, 0, otaLevel));
+      rgbLed.show();
+      }
+#endif
+      continue;
+    }
 
     uint8_t red = 0;
     uint8_t green = 0;
@@ -103,6 +133,19 @@ void rgbTask(void *) {
         holdMs = 600;
         name = "MQTT_FAILED_RED";
         break;
+#if CO2_ENABLE_OTA
+      case RgbSignal::OTA_READY:
+        red = 24;
+        blue = 24;
+        holdMs = 250;
+        name = "OTA_READY_PURPLE";
+        break;
+      case RgbSignal::OTA_FAILED:
+        red = 40;
+        holdMs = 900;
+        name = "OTA_FAILED_RED";
+        break;
+#endif
     }
     rgbLed.setPixelColor(0, rgbLed.Color(red, green, blue));
     rgbLed.show();
@@ -119,6 +162,55 @@ String gatewayId() {
   mac.replace(":", "");
   return String("co2s3-remote-") + mac;
 }
+
+#if CO2_ENABLE_OTA
+void setupOta() {
+  otaHostname = gatewayId();
+  ArduinoOTA.setHostname(otaHostname.c_str());
+  // The router password remains in ignored include/secrets.h and is never published.
+  ArduinoOTA.setPassword(kRouterPassword);
+  ArduinoOTA.onStart([]() {
+    otaInProgress = true;
+    if (mqtt.connected()) mqtt.disconnect();
+    pauseBleScanner();
+    Serial.printf("[S3_OTA] start type=%s\n",
+                  ArduinoOTA.getCommand() == U_FLASH ? "firmware" : "filesystem");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    static uint8_t lastReportedPct = 255;
+    const uint8_t pct = total == 0 ? 0 : static_cast<uint8_t>((progress * 100U) / total);
+    if (pct == 100 || lastReportedPct == 255 || pct >= lastReportedPct + 10) {
+      lastReportedPct = pct;
+      Serial.printf("[S3_OTA] progress=%u%%\n", pct);
+    }
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("[S3_OTA] end rebooting");
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("[S3_OTA] error=%u\n", error);
+    otaInProgress = false;
+    enqueueRgb(RgbSignal::OTA_FAILED);
+    if (!resumeBleScanner()) {
+      Serial.println("[S3_OTA] BLE resume failed; recovery task will retry");
+    }
+  });
+  ArduinoOTA.begin();
+  otaReady = true;
+  enqueueRgb(RgbSignal::OTA_READY);
+  Serial.printf("[S3_OTA] ready host=%s.local ip=%s sketch=%u free_ota=%u\n",
+                otaHostname.c_str(), WiFi.localIP().toString().c_str(), ESP.getSketchSize(),
+                ESP.getFreeSketchSpace());
+}
+
+void serviceOta() {
+  if (WiFi.status() != WL_CONNECTED) return;
+  if (!otaReady) setupOta();
+  ArduinoOTA.handle();
+}
+#else
+void serviceOta() {}
+#endif
 
 void serviceWiFi() {
   if (WiFi.status() == WL_CONNECTED) {
@@ -142,9 +234,9 @@ void serviceWiFi() {
   lastWiFiAttemptMs = now;
   wifiDeadlineMs = now + kWiFiAttemptTimeoutMs;
   wifiConnecting = true;
-  Serial.printf("[S3_STA] connect ssid=%s channel=%u retry=%lu ms\n", kRouterSsid,
-                kRouterChannel, static_cast<unsigned long>(wifiRetryMs));
-  WiFi.begin(kRouterSsid, kRouterPassword, kRouterChannel);
+  Serial.printf("[S3_STA] connect ssid=%s channel=auto retry=%lu ms\n", kRouterSsid,
+                static_cast<unsigned long>(wifiRetryMs));
+  WiFi.begin(kRouterSsid, kRouterPassword);
   wifiRetryMs = std::min(wifiRetryMs * 2, kReconnectMaxMs);
 }
 
@@ -174,31 +266,34 @@ void serviceMqtt() {
   }
 }
 
-bool publishReading(const SensorReading &reading, bool heartbeat) {
+bool publishReading(const SensorReading &reading) {
   if (!mqtt.connected() || !reading.valid) return false;
   const uint32_t ageMs = millis() - reading.seenMs;
   char payload[384];
   snprintf(payload, sizeof(payload),
-           "{\"schema\":1,\"device_id\":\"%s\",\"message_type\":\"%s\","
+           "{\"schema\":2,\"firmware_version\":\"%s\",\"device_id\":\"%s\","
+           "\"message_type\":\"telemetry\","
            "\"seq\":%lu,\"co2_ppm\":%u,\"temperature_c\":%.1f,"
            "\"humidity_pct\":%u,\"battery_pct\":%u,\"ble_rssi_dbm\":%d,"
            "\"sensor_address\":\"%s\",\"sensor_age_ms\":%lu,"
-           "\"sensor_data_valid\":true,\"uptime_ms\":%lu}",
-           gatewayId().c_str(), heartbeat ? "heartbeat" : "telemetry",
+           "\"sensor_data_valid\":true,\"publish_interval_ms\":%lu,"
+           "\"uptime_ms\":%lu}",
+           kFirmwareVersion, gatewayId().c_str(),
            static_cast<unsigned long>(reading.seq), reading.co2Ppm, reading.temperatureC,
            reading.humidityPct, reading.batteryPct, reading.rssi, reading.address,
-           static_cast<unsigned long>(ageMs), static_cast<unsigned long>(millis()));
+           static_cast<unsigned long>(ageMs), static_cast<unsigned long>(kPublishIntervalMs),
+           static_cast<unsigned long>(millis()));
   enqueueRgb(RgbSignal::PAYLOAD_READY);
   Serial.printf("[S3_PAYLOAD] packed seq=%lu bytes=%u\n",
                 static_cast<unsigned long>(reading.seq), strlen(payload));
-  const bool ok = mqtt.publish(kTopic, payload, false);
+  const bool ok = mqtt.publish(mqttTopic.c_str(), payload, false);
   if (ok) {
     lastPublishMs = millis();
     lastPublishedSeq = reading.seq;
     ++publishCount;
-    Serial.printf("[S3_MQTT] published #%lu topic=%s seq=%lu type=%s\n",
-                  static_cast<unsigned long>(publishCount), kTopic,
-                  static_cast<unsigned long>(reading.seq), heartbeat ? "heartbeat" : "telemetry");
+    Serial.printf("[S3_MQTT] published #%lu topic=%s seq=%lu type=telemetry age=%lums\n",
+                  static_cast<unsigned long>(publishCount), mqttTopic.c_str(),
+                  static_cast<unsigned long>(reading.seq), static_cast<unsigned long>(ageMs));
     enqueueRgb(RgbSignal::MQTT_PUBLISHED);
   } else {
     Serial.println("[S3_MQTT] publish failed");
@@ -209,11 +304,29 @@ bool publishReading(const SensorReading &reading, bool heartbeat) {
 
 void bleTask(void *) {
   Serial.printf("[S3_CORE1_BLE] start core=%d\n", xPortGetCoreID());
+  const uint32_t wifiWaitStartedMs = millis();
+  uint32_t lastWaitLogMs = 0;
+  while (WiFi.status() != WL_CONNECTED &&
+         millis() - wifiWaitStartedMs < kBleInitialWifiWaitMs) {
+    const uint32_t now = millis();
+    if (lastWaitLogMs == 0 || now - lastWaitLogMs >= 5000) {
+      lastWaitLogMs = now;
+      Serial.printf("[S3_CORE1_BLE] waiting for initial STA status=%d elapsed=%lus\n",
+                    WiFi.status(), static_cast<unsigned long>((now - wifiWaitStartedMs) / 1000));
+    }
+    vTaskDelay(pdMS_TO_TICKS(100));
+  }
+  Serial.printf("[S3_CORE1_BLE] initial STA gate=%s; starting scanner\n",
+                WiFi.status() == WL_CONNECTED ? "connected" : "timeout_fallback");
   if (!setupBleScanner()) {
     Serial.println("[S3_CORE1_BLE] scanner start failed");
   }
   uint32_t queuedSeq = 0;
   for (;;) {
+    if (otaInProgress) {
+      vTaskDelay(pdMS_TO_TICKS(100));
+      continue;
+    }
     serviceBleScanner();
     const BleSnapshot snapshot = getBleSnapshot();
     if (snapshot.decodedValid && snapshot.packetCount != queuedSeq) {
@@ -241,6 +354,11 @@ void gatewayTask(void *) {
   Serial.printf("[S3_CORE0_GATEWAY] start core=%d\n", xPortGetCoreID());
   for (;;) {
     serviceWiFi();
+    serviceOta();
+    if (otaInProgress) {
+      vTaskDelay(pdMS_TO_TICKS(20));
+      continue;
+    }
     serviceMqtt();
 
     SensorReading incoming{};
@@ -251,14 +369,13 @@ void gatewayTask(void *) {
 
     const uint32_t now = millis();
     if (hasLatestReading && mqtt.connected()) {
+      const uint32_t readingAgeMs = now - latestReading.seenMs;
+      const bool readingFresh = readingAgeMs <= kSensorFreshMaxMs;
       const bool firstPublish = publishCount == 0;
       const bool nextReadingDue = latestReading.seq != lastPublishedSeq &&
                                   now - lastPublishMs >= kPublishIntervalMs;
-      const bool heartbeatDue = now - lastPublishMs >= kHeartbeatIntervalMs;
-      if (firstPublish || nextReadingDue) {
-        publishReading(latestReading, false);
-      } else if (heartbeatDue) {
-        publishReading(latestReading, true);
+      if (readingFresh && (firstPublish || nextReadingDue)) {
+        publishReading(latestReading);
       }
     }
 
@@ -281,12 +398,20 @@ void setup() {
   Serial.begin(115200);
   delay(300);
   Serial.printf("\nCO2_S3 Remote Gateway V%s\n", kFirmwareVersion);
-  Serial.println("[S3_BOOT] BLE core=1, Wi-Fi/MQTT core=0; RF is Wi-Fi/BLE time-shared");
+  Serial.printf("[S3_BOOT] BLE core=1, Wi-Fi/MQTT core=0, OTA=%s; RF is time-shared\n",
+                CO2_ENABLE_OTA ? "enabled" : "disabled");
+  Serial.printf("[S3_BOOT] flash=%uMB psram=%uMB image_md5=%s\n",
+                ESP.getFlashChipSize() / (1024U * 1024U),
+                ESP.getPsramSize() / (1024U * 1024U), ESP.getSketchMD5().c_str());
   WiFi.mode(WIFI_STA);
   WiFi.setSleep(true);
   WiFi.setAutoReconnect(false);
+  mqttTopic = String("co2/") + gatewayId() + "/telemetry";
   mqtt.setServer(kBroker, kBrokerPort);
   mqtt.setBufferSize(512);
+  Serial.printf("[S3_BOOT] publish_interval=%lums fresh_max=%lums topic=%s\n",
+                static_cast<unsigned long>(kPublishIntervalMs),
+                static_cast<unsigned long>(kSensorFreshMaxMs), mqttTopic.c_str());
   readingQueue = xQueueCreate(1, sizeof(SensorReading));
   rgbQueue = xQueueCreate(8, sizeof(RgbSignal));
   if (readingQueue == nullptr || rgbQueue == nullptr) {

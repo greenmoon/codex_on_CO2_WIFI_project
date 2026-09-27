@@ -13,7 +13,7 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <details>
 <summary>(033 2026-09-27 16:42) <b>Q:</b> 如何排除 Global Dashboard 非預期的 647 ppm，並加入 10 秒更新、聲音警報與低調版本列？</summary>
 <p class="answer"><b>A:</b> 已完成 Firmware／Dashboard <code>R1.3.0</code>。RCA 實測時 Global Dashboard 顯示 647 ppm，但同時間 S3 Serial 為 589 ppm 且 <code>sta=1、mqtt=0、pub=0</code>，證明 647 來自共用 <code>co2</code> topic 的其他 publisher。新版改用專用 topic <code>co2/co2s3-remote-14c19f508e10/telemetry</code>，Dashboard 固定驗證 device ID、schema 2、遞增 sequence、非 retained、有效旗標與資料年齡；Firmware 每 10 秒最多發布一筆新的 BLE reading。</p>
-<p><b>Evidence / next check：</b>R1.3.0 編譯與 USB flash hash verification 成功；實機 BLE 已解碼 764–779 ppm、25.6–25.7°C、51–53%、電池 100%。Dashboard 新增 Sound Enable／Disable、分級聲音、stale 自動靜音，以及底部 FW／Dashboard／Schema／MQTT-WSS 版本列。當次測試 iPhone Hotspot 未被 STA 發現，因此專用 topic 的實際 MQTT 10 秒發布及 Global Dashboard 收值仍待開啟 Hotspot 後驗證。</p>
+<p><b>Evidence / next check：</b>R1.3.0 編譯與 USB flash hash verification 成功；實機 BLE 已解碼 764–779 ppm、25.6–25.7°C、51–53%、電池 100%。GitHub Pages 已顯示 R1.3.0、專用 topic、Sound Enable／Disable 與底部版本列；WSS 連線後連續觀察 20 秒仍維持 <code>---</code>，證明舊 <code>co2</code> topic 的 647 已被隔離。當次測試 iPhone Hotspot 未被 STA 發現，因此專用 topic 的實際 MQTT 10 秒發布、聲音 pattern 與 Global Dashboard 收值仍待開啟 Hotspot 後驗證。</p>
 </details>
 <details>
 <summary>(032 2026-09-25 20:51) <b>Q:</b> ESP32-S3 R1.2.0 是否已在不啟動 OTA 的情況下，透過 iPhone Hotspot 將真實 CO₂ 顯示到 Global Dashboard？</summary>

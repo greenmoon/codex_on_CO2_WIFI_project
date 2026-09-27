@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V35 2026.09.27 20:47</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V36 2026.09.27 21:02</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(037 2026-09-27 21:02) <b>Q:</b> 如何讓 iPhone Dashboard 每 30 秒中文播報最新 CO₂，並避免和 beep 重疊？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.4</code> 新增預設 Enable 的 <code>zh-TW</code> Voice Alert、30 秒倒數、20% App-level 音量、音量滑桿、Test Voice 與語音預覽；beep 音量也統一為 20%。語音依 CO₂ 五級產生短句，播放前停止 beep，語音播放期間 beep 暫停。</p>
+<p><b>Evidence / next check：</b>已完成 JavaScript／HTML 語法、五個語音級距、30 秒常數、20% 音量與 DOM 元件檢查。資料超過 16 秒時不讀舊值，僅播報一次中斷；恢復後僅播報一次恢復。下一步需在實體 iPhone 任意觸控一次或按 <code>Test Voice</code>，確認繁體中文語音、30 秒週期及實際 20% 音量；iOS 系統媒體音量仍須由使用者控制。</p>
+</details>
 <details>
 <summary>(036 2026-09-27 20:47) <b>Q:</b> 如何讓 Global Dashboard 加入 iPhone 主畫面時顯示專用 App 圖示？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.3</code> 已新增 180×180 Apple Touch Icon、192×192／512×512 PWA PNG、Web App Manifest 與 iOS standalone metadata。圖示採暖白底、深綠 CO₂、809 示意數值、Wi-Fi 與綠色 LIVE，名稱為 <code>CO₂ Dashboard</code>。</p>
@@ -198,6 +203,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V35 — 2026-09-27 20:47</footer>
+<footer>CO2_WIFI Project QA Digest — V36 — 2026-09-27 21:02</footer>
 </body>
 </html>

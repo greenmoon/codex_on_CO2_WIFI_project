@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V43 2026.09.28 22:02</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V44 2026.09.29 07:08</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(045 2026-09-29 07:08) <b>Q:</b> S3 如何在家用 router 與 iPhone hotspot 間切換，並在公開 Dashboard 安全顯示目前網路？</summary>
+<p class="answer"><b>A:</b> ESP32-S3 firmware <code>R1.3.1</code> 新增 HOME 優先、IPHONE 備援的非掃描式 failover；首次啟動每個 profile 失敗一次即切換，曾成功連線後則目前 profile 連續失敗三次才切換。MQTT schema 2 以相容的新增欄位發布 <code>wifi_profile</code> 與 <code>wifi_rssi_dbm</code>，不發布實際 SSID。Dashboard <code>R1.3.12</code> 在來源資訊下方以 10px 灰字顯示例如 <code>Wi‑Fi: HOME · -55 dBm</code>；真實 SSID 與密碼只保存在被 Git 排除的本機 <code>include/secrets.h</code>。</p>
+<p><b>Evidence / next check：</b>S3 四個 PlatformIO environment（一般、OTA、N16R8、N16R8 OTA）均編譯成功；一般版 RAM 15.8%、Flash 27.0%。payload 已具 448-byte buffer 與截斷保護，Dashboard HTML／JavaScript、HOME／IPHONE 白名單、RSSI 顯示及不使用 <code>wifi_ssid</code> 均通過自動檢查。實際 HOME→IPHONE／IPHONE→HOME RF failover、RGB 與新欄位仍需燒錄 R1.3.1 後實機驗證。</p>
+</details>
 <details>
 <summary>(044 2026-09-28 22:02) <b>Q:</b> 點擊 ON 時如何同時確認語音警報啟用並播報目前 CO₂？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.11</code> 將 ON 的語音改為單一完整句：「二氧化碳語音警報已啟用。目前二氧化碳濃度 N PPM，狀態……。」；單一 utterance 可避免第二段語音取消第一段。若尚未收到資料或最後 payload 已超過 16 秒，ON 與綠色目前值按鈕皆改播「目前尚未收到有效的二氧化碳資料」，不把過期數值稱為目前值。</p>
@@ -238,6 +243,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V43 — 2026-09-28 22:02</footer>
+<footer>CO2_WIFI Project QA Digest — V44 — 2026-09-29 07:08</footer>
 </body>
 </html>

@@ -16,7 +16,7 @@
 #include "secrets.h"
 
 namespace {
-constexpr char kFirmwareVersion[] = "R1.3.0";
+constexpr char kFirmwareVersion[] = "R1.3.1";
 constexpr char kBroker[] = "59.124.7.98";
 constexpr uint16_t kBrokerPort = 1883;
 constexpr uint32_t kWiFiAttemptTimeoutMs = 15000;
@@ -25,6 +25,7 @@ constexpr uint32_t kBleInitialWifiWaitMs = 45000;
 constexpr uint32_t kPublishIntervalMs = 10000;
 constexpr uint32_t kSensorFreshMaxMs = 15000;
 constexpr uint32_t kDebugIntervalMs = 5000;
+constexpr uint8_t kReconnectFailuresBeforeSwitch = 3;
 // ESP32-S3-DevKitC-1 boards with the standard addressable RGB LED use GPIO48.
 // Change only this value if the connected S3 board routes its RGB LED elsewhere.
 constexpr uint8_t kRgbLedPin = 48;
@@ -41,6 +42,18 @@ struct SensorReading {
   uint32_t seenMs = 0;
   char address[24]{};
 };
+
+struct WifiProfile {
+  const char *alias;
+  const char *ssid;
+  const char *password;
+};
+
+constexpr WifiProfile kWifiProfiles[] = {
+    {"HOME", kS3HomeRouterSsid, kS3HomeRouterPassword},
+    {"IPHONE", kS3IphoneRouterSsid, kS3IphoneRouterPassword},
+};
+constexpr size_t kWifiProfileCount = sizeof(kWifiProfiles) / sizeof(kWifiProfiles[0]);
 
 enum class RgbSignal : uint8_t {
   BLE_READ,
@@ -70,6 +83,11 @@ uint32_t wifiRetryMs = 1000;
 uint32_t lastMqttAttemptMs = 0;
 uint32_t mqttRetryMs = 1000;
 bool wifiConnecting = false;
+bool wifiWasConnected = false;
+bool wifiHasEverConnected = false;
+uint8_t wifiProfileFailures = 0;
+size_t activeWifiProfileIndex = 0;
+size_t connectedWifiProfileIndex = 0;
 String mqttTopic;
 #if CO2_ENABLE_OTA
 volatile bool otaInProgress = false;
@@ -163,6 +181,24 @@ String gatewayId() {
   return String("co2s3-remote-") + mac;
 }
 
+const WifiProfile &activeWifiProfile() {
+  return kWifiProfiles[activeWifiProfileIndex];
+}
+
+const char *connectedWifiAlias() {
+  return kWifiProfiles[connectedWifiProfileIndex].alias;
+}
+
+void switchWifiProfile(const char *reason) {
+  const WifiProfile &previous = activeWifiProfile();
+  activeWifiProfileIndex = (activeWifiProfileIndex + 1) % kWifiProfileCount;
+  wifiProfileFailures = 0;
+  wifiRetryMs = 1000;
+  lastWiFiAttemptMs = 0;
+  Serial.printf("[S3_WIFI_FAILOVER] %s -> %s reason=%s\n", previous.alias,
+                activeWifiProfile().alias, reason);
+}
+
 #if CO2_ENABLE_OTA
 void setupOta() {
   otaHostname = gatewayId();
@@ -213,30 +249,52 @@ void serviceOta() {}
 #endif
 
 void serviceWiFi() {
+  const uint32_t now = millis();
   if (WiFi.status() == WL_CONNECTED) {
-    if (wifiConnecting) {
-      Serial.printf("[S3_STA] connected ip=%s rssi=%d\n",
-                    WiFi.localIP().toString().c_str(), WiFi.RSSI());
+    if (!wifiWasConnected) {
+      connectedWifiProfileIndex = activeWifiProfileIndex;
+      Serial.printf("[S3_STA] connected profile=%s ip=%s rssi=%d\n",
+                    connectedWifiAlias(), WiFi.localIP().toString().c_str(), WiFi.RSSI());
     }
+    wifiWasConnected = true;
+    wifiHasEverConnected = true;
     wifiConnecting = false;
+    wifiProfileFailures = 0;
     wifiRetryMs = 1000;
     return;
   }
 
-  const uint32_t now = millis();
-  if (wifiConnecting && now >= wifiDeadlineMs) {
-    Serial.printf("[S3_STA] timeout status=%d\n", WiFi.status());
+  if (wifiWasConnected) {
+    Serial.printf("[S3_STA] disconnected profile=%s status=%d\n", connectedWifiAlias(),
+                  WiFi.status());
+    wifiWasConnected = false;
+    wifiConnecting = false;
+    wifiProfileFailures = 0;
+    wifiRetryMs = 1000;
+    lastWiFiAttemptMs = 0;
+  }
+
+  if (wifiConnecting && static_cast<int32_t>(now - wifiDeadlineMs) >= 0) {
+    ++wifiProfileFailures;
+    Serial.printf("[S3_STA] timeout profile=%s status=%d failure=%u\n",
+                  activeWifiProfile().alias, WiFi.status(), wifiProfileFailures);
     WiFi.disconnect(false, false);
     wifiConnecting = false;
+    const uint8_t failureLimit = wifiHasEverConnected ? kReconnectFailuresBeforeSwitch : 1;
+    if (wifiProfileFailures >= failureLimit) {
+      switchWifiProfile("connect_timeout");
+    }
+    return;
   }
   if (wifiConnecting || now - lastWiFiAttemptMs < wifiRetryMs) return;
 
+  const WifiProfile &profile = activeWifiProfile();
   lastWiFiAttemptMs = now;
   wifiDeadlineMs = now + kWiFiAttemptTimeoutMs;
   wifiConnecting = true;
-  Serial.printf("[S3_STA] connect ssid=%s channel=auto retry=%lu ms\n", kRouterSsid,
+  Serial.printf("[S3_STA] connect profile=%s channel=auto retry=%lu ms\n", profile.alias,
                 static_cast<unsigned long>(wifiRetryMs));
-  WiFi.begin(kRouterSsid, kRouterPassword);
+  WiFi.begin(profile.ssid, profile.password);
   wifiRetryMs = std::min(wifiRetryMs * 2, kReconnectMaxMs);
 }
 
@@ -269,20 +327,29 @@ void serviceMqtt() {
 bool publishReading(const SensorReading &reading) {
   if (!mqtt.connected() || !reading.valid) return false;
   const uint32_t ageMs = millis() - reading.seenMs;
-  char payload[384];
-  snprintf(payload, sizeof(payload),
-           "{\"schema\":2,\"firmware_version\":\"%s\",\"device_id\":\"%s\","
-           "\"message_type\":\"telemetry\","
-           "\"seq\":%lu,\"co2_ppm\":%u,\"temperature_c\":%.1f,"
-           "\"humidity_pct\":%u,\"battery_pct\":%u,\"ble_rssi_dbm\":%d,"
-           "\"sensor_address\":\"%s\",\"sensor_age_ms\":%lu,"
-           "\"sensor_data_valid\":true,\"publish_interval_ms\":%lu,"
-           "\"uptime_ms\":%lu}",
-           kFirmwareVersion, gatewayId().c_str(),
-           static_cast<unsigned long>(reading.seq), reading.co2Ppm, reading.temperatureC,
-           reading.humidityPct, reading.batteryPct, reading.rssi, reading.address,
-           static_cast<unsigned long>(ageMs), static_cast<unsigned long>(kPublishIntervalMs),
-           static_cast<unsigned long>(millis()));
+  char payload[448];
+  const int written = snprintf(payload, sizeof(payload),
+                               "{\"schema\":2,\"firmware_version\":\"%s\","
+                               "\"device_id\":\"%s\",\"message_type\":\"telemetry\","
+                               "\"seq\":%lu,\"co2_ppm\":%u,\"temperature_c\":%.1f,"
+                               "\"humidity_pct\":%u,\"battery_pct\":%u,"
+                               "\"ble_rssi_dbm\":%d,\"sensor_address\":\"%s\","
+                               "\"sensor_age_ms\":%lu,\"sensor_data_valid\":true,"
+                               "\"wifi_profile\":\"%s\",\"wifi_rssi_dbm\":%d,"
+                               "\"publish_interval_ms\":%lu,\"uptime_ms\":%lu}",
+                               kFirmwareVersion, gatewayId().c_str(),
+                               static_cast<unsigned long>(reading.seq), reading.co2Ppm,
+                               reading.temperatureC, reading.humidityPct, reading.batteryPct,
+                               reading.rssi, reading.address, static_cast<unsigned long>(ageMs),
+                               connectedWifiAlias(), WiFi.RSSI(),
+                               static_cast<unsigned long>(kPublishIntervalMs),
+                               static_cast<unsigned long>(millis()));
+  if (written < 0 || static_cast<size_t>(written) >= sizeof(payload)) {
+    Serial.printf("[S3_PAYLOAD] overflow required=%d capacity=%u\n", written,
+                  static_cast<unsigned>(sizeof(payload)));
+    enqueueRgb(RgbSignal::MQTT_FAILED);
+    return false;
+  }
   enqueueRgb(RgbSignal::PAYLOAD_READY);
   Serial.printf("[S3_PAYLOAD] packed seq=%lu bytes=%u\n",
                 static_cast<unsigned long>(reading.seq), strlen(payload));
@@ -382,9 +449,12 @@ void gatewayTask(void *) {
     if (now - lastDebugMs >= kDebugIntervalMs) {
       lastDebugMs = now;
       const BleSnapshot ble = getBleSnapshot();
-      Serial.printf("[S3_DEBUG] up=%lus core=%d heap=%u sta=%d mqtt=%d pub=%lu ble=%d seq=%lu age=%lums\n",
+      const bool wifiConnected = WiFi.status() == WL_CONNECTED;
+      Serial.printf("[S3_DEBUG] up=%lus core=%d heap=%u sta=%d profile=%s wifi_rssi=%d "
+                    "mqtt=%d pub=%lu ble=%d seq=%lu age=%lums\n",
                     static_cast<unsigned long>(now / 1000), xPortGetCoreID(), ESP.getFreeHeap(),
-                    WiFi.status(), mqtt.connected() ? 1 : 0,
+                    WiFi.status(), wifiConnected ? connectedWifiAlias() : activeWifiProfile().alias,
+                    wifiConnected ? WiFi.RSSI() : 0, mqtt.connected() ? 1 : 0,
                     static_cast<unsigned long>(publishCount), ble.decodedValid ? 1 : 0,
                     static_cast<unsigned long>(ble.packetCount),
                     static_cast<unsigned long>(ble.candidateSeen ? now - ble.lastSeenMs : 0));
@@ -406,6 +476,10 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.setSleep(true);
   WiFi.setAutoReconnect(false);
+  Serial.printf("[S3_BOOT] Wi-Fi profiles priority=%s -> %s timeout=%lums reconnect_failures=%u\n",
+                kWifiProfiles[0].alias, kWifiProfiles[1].alias,
+                static_cast<unsigned long>(kWiFiAttemptTimeoutMs),
+                kReconnectFailuresBeforeSwitch);
   mqttTopic = String("co2/") + gatewayId() + "/telemetry";
   mqtt.setServer(kBroker, kBrokerPort);
   mqtt.setBufferSize(512);

@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V44 2026.09.29 07:08</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V45 2026.09.29 07:26</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(046 2026-09-29 07:26) <b>Q:</b> ESP32-S3 R1.3.1 是否已用正確 N16R8 profile 燒錄，並實機確認 HOME、BLE 與 MQTT？</summary>
+<p class="answer"><b>A:</b> 是。實機辨識為 ESP32-S3 rev 0.2、16 MB Flash、8 MB PSRAM，已用 <code>esp32-s3-remote-gateway-n16r8</code> environment 完成 R1.3.1 USB flash，全部區段均通過 SHA hash verification。Serial 實測 <code>sta=3</code>、<code>profile=HOME</code>、Wi-Fi RSSI 約 −48 至 −50 dBm、<code>mqtt=1</code>，BLE advertising 解碼為 584 ppm、27.8°C、67%、電池 100%。</p>
+<p><b>Evidence / next check：</b>監控至 uptime 50 秒，MQTT 專用 topic 已連續發布至少 5 筆，payload 376 bytes；RGB log 依序出現 <code>BLE_READ_BLUE</code>、<code>PAYLOAD_CYAN</code>、<code>MQTT_PUBLISHED_GREEN</code>。HOME 路徑已通過；下一步仍需保持 iPhone hotspot 開啟後中斷 HOME AP，驗證三次 timeout 後切換至 IPHONE，以及 Dashboard 顯示 <code>Wi‑Fi: IPHONE</code>。</p>
+</details>
 <details>
 <summary>(045 2026-09-29 07:08) <b>Q:</b> S3 如何在家用 router 與 iPhone hotspot 間切換，並在公開 Dashboard 安全顯示目前網路？</summary>
 <p class="answer"><b>A:</b> ESP32-S3 firmware <code>R1.3.1</code> 新增 HOME 優先、IPHONE 備援的非掃描式 failover；首次啟動每個 profile 失敗一次即切換，曾成功連線後則目前 profile 連續失敗三次才切換。MQTT schema 2 以相容的新增欄位發布 <code>wifi_profile</code> 與 <code>wifi_rssi_dbm</code>，不發布實際 SSID。Dashboard <code>R1.3.12</code> 在來源資訊下方以 10px 灰字顯示例如 <code>Wi‑Fi: HOME · -55 dBm</code>；真實 SSID 與密碼只保存在被 Git 排除的本機 <code>include/secrets.h</code>。</p>

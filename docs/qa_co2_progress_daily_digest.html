@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V38 2026.09.27 21:34</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V39 2026.09.28 08:40</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(040 2026-09-28 08:40) <b>Q:</b> 如何讓 Voice 按鈕直接播報目前 CO₂，並把預設音量提高到 50%？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.7</code> 將 <code>Test Voice</code> 改為 <code>Voice Current CO₂ ppm</code>；有有效資料時直接呼叫既有風險級距語句，沒有資料時播報「目前尚未收到有效的二氧化碳資料。」。Voice volume 新預設為 50%，並以一次性 migration 將舊版未調整的 20% 預設升到 50%；其他既有自訂音量保持不變。</p>
+<p><b>Evidence / next check：</b>HTML／JavaScript 語法、DOM ID、50% 新安裝預設、20%→50% migration、35% 自訂值保留及 Voice interval 邊界測試已完成；beep／Web Audio 程式仍不存在。下一步需在實體 iPhone 點擊一次 <code>Voice Current CO₂ ppm</code>，確認 Safari 以目前即時 ppm 及 50% App-level 音量播報；實際系統音量仍由 iPhone 媒體音量控制。</p>
+</details>
 <details>
 <summary>(039 2026-09-27 21:34) <b>Q:</b> 為何 MacBook 仍每約 10 秒發出一聲 beep，如何完全移除？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.6</code> 已完全移除 beep／Web Audio demo、Sound 卡片、oscillator、alarm pattern 與每筆 payload 的 <code>playAlarm()</code> 呼叫，只保留中文 Voice Alert。RCA 是 MacBook 仍開著的舊版 Dashboard 分頁在每筆約 10 秒 MQTT payload 後執行 beep；800–999 ppm 規則正好是一聲，iPhone 並未發聲。</p>
@@ -213,6 +218,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V38 — 2026-09-27 21:34</footer>
+<footer>CO2_WIFI Project QA Digest — V39 — 2026-09-28 08:40</footer>
 </body>
 </html>

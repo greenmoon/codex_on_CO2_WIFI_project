@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V42 2026.09.28 21:51</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V43 2026.09.28 22:02</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(044 2026-09-28 22:02) <b>Q:</b> 點擊 ON 時如何同時確認語音警報啟用並播報目前 CO₂？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.11</code> 將 ON 的語音改為單一完整句：「二氧化碳語音警報已啟用。目前二氧化碳濃度 N PPM，狀態……。」；單一 utterance 可避免第二段語音取消第一段。若尚未收到資料或最後 payload 已超過 16 秒，ON 與綠色目前值按鈕皆改播「目前尚未收到有效的二氧化碳資料」，不把過期數值稱為目前值。</p>
+<p><b>Evidence / next check：</b>已檢查 HTML／JavaScript 語法、ON handler 組合單一語句、有效資料與 stale/no-data 分支、Voice Current 共用新鮮度判斷、100% 音量及無 Web Audio beep。下一步需在實體 iPhone 收到新鮮 payload 後點擊 ON，確認實際依序聽到啟用提示、ppm 與狀態。</p>
+</details>
 <details>
 <summary>(043 2026-09-28 21:51) <b>Q:</b> 如何把目前 CO₂ 播報按鈕加高，並將警示資訊整合在綠色觸控區內？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.10</code> 將綠色 <code>Voice Current CO₂ ppm</code> 按鈕最小高度由 78px 增加為 210px，並把 Interval、語音狀態與目前完整播報文字全部移入按鈕內。整個綠色區域皆為同一個播報觸控目標，ON／OFF 雙按鈕則維持各 78px 高度。</p>
@@ -233,6 +238,6 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <p class="legend">色彩：綠色＝優先局部復原；黃色＝子系統重啟；紅色＝整機最後復原。</p>
 <p><b>Evidence / next check：</b>已完成 PHY／Link／應用層故障隔離與復原策略設計；建議初始門檻為 BLE 連線失敗 3 次後重掃描、持續 30–60 秒無資料後重啟 BLE，並採 1、2、4、8 秒至最高 30 秒的退避。此項尚未以 ESP32-C3 實機封包遺失、BLE 斷線及 Wi-Fi 重連測試驗證。</p>
 </details>
-<footer>CO2_WIFI Project QA Digest — V42 — 2026-09-28 21:51</footer>
+<footer>CO2_WIFI Project QA Digest — V43 — 2026-09-28 22:02</footer>
 </body>
 </html>

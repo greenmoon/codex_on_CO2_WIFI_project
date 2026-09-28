@@ -36,21 +36,25 @@ After generating or modifying project files:
    - For application/code changes, use `index.html`.
 3. Automatically open or reload that corresponding HTML for visual checking.
 4. For application/code changes, read the actual version from the completed `index.html`; never hard-code or guess it.
-5. Finish the user-facing handoff with exactly one of these patterns:
+5. Finish the user-facing handoff with two color-coded status lines:
+   - Green `🟢 JB_DONE>` reports the verified completed result.
+   - Blue `🔵 JB_NEXT>` reports the single most useful next action. If no action remains, use `No pending task`.
 
 QA report change:
 
 ```text
-JB_Done> QA Report 已更新, Checking on 'qa_co2_progress_daily_digest.html'
+🟢 JB_DONE> QA Report 已更新, Checking on 'qa_co2_progress_daily_digest.html'
+🔵 JB_NEXT> <next verification or action>
 ```
 
 Application/code change (substitute the actual version):
 
 ```text
-JB_Done> 已修正 V1.14.0, Checking on 'index.html'
+🟢 JB_DONE> 已修正 V1.14.0, Checking on 'index.html'
+🔵 JB_NEXT> <next verification or action>
 ```
 
-If the corresponding HTML cannot be opened automatically, state the reason immediately before the required handoff line. Do not claim that visual or physical BLE verification passed unless it was actually performed.
+Keep these as the final two lines, in DONE then NEXT order. If the corresponding HTML cannot be opened automatically, state the reason immediately before the required handoff lines. Do not claim that visual or physical BLE verification passed unless it was actually performed.
 
 ## Auto QA progress record rule
 

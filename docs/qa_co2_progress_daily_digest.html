@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V45 2026.09.29 07:26</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V46 2026.09.29 07:38</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(047 2026-09-29 07:38) <b>Q:</b> 任務完成時如何區分已完成結果與下一步？</summary>
+<p class="answer"><b>A:</b> 專案交接格式已改為固定兩行：綠色 <code>🟢 JB_DONE&gt;</code> 顯示已驗證完成的結果，藍色 <code>🔵 JB_NEXT&gt;</code> 顯示唯一且最有用的下一個動作；若沒有待辦，NEXT 顯示 <code>No pending task</code>。兩行固定依 DONE、NEXT 順序放在回覆最末端。</p>
+<p><b>Evidence / next check：</b><code>AGENTS.md</code> 的 Code completion handoff rule、QA 與 application 範例均已同步更新。後續任務完成回覆即可直接觀察兩種彩色符號與不同用途。</p>
+</details>
 <details>
 <summary>(046 2026-09-29 07:26) <b>Q:</b> ESP32-S3 R1.3.1 是否已用正確 N16R8 profile 燒錄，並實機確認 HOME、BLE 與 MQTT？</summary>
 <p class="answer"><b>A:</b> 是。實機辨識為 ESP32-S3 rev 0.2、16 MB Flash、8 MB PSRAM，已用 <code>esp32-s3-remote-gateway-n16r8</code> environment 完成 R1.3.1 USB flash，全部區段均通過 SHA hash verification。Serial 實測 <code>sta=3</code>、<code>profile=HOME</code>、Wi-Fi RSSI 約 −48 至 −50 dBm、<code>mqtt=1</code>，BLE advertising 解碼為 584 ppm、27.8°C、67%、電池 100%。</p>

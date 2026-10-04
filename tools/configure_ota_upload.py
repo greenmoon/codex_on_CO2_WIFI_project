@@ -18,10 +18,17 @@ def find_string(name: str) -> str | None:
     return match.group(1) if match else None
 
 
-password = find_string("kOtaPassword") or find_string("kRouterPassword")
+password = find_string("kOtaPassword")
 if not password:
     raise RuntimeError(
-        "Define kOtaPassword[] or kRouterPassword[] in ignored include/secrets.h"
+        "Define dedicated kOtaPassword[] in ignored include/secrets.h"
     )
 
-env.Append(UPLOAD_FLAGS=[f"--auth={password}"])  # type: ignore[name-defined]
+# Run as a post script because the ESP32 platform creates UPLOADERFLAGS in its
+# main builder. Remove --debug so espota does not echo the private password in
+# its parsed-options diagnostic output.
+uploader_flags = [
+    flag for flag in env.get("UPLOADERFLAGS", []) if flag != "--debug"  # type: ignore[name-defined]
+]
+uploader_flags.extend(["--auth", password])
+env.Replace(UPLOADERFLAGS=uploader_flags)  # type: ignore[name-defined]

@@ -16,7 +16,7 @@
 #include "secrets.h"
 
 namespace {
-constexpr char kFirmwareVersion[] = "R1.3.1";
+constexpr char kFirmwareVersion[] = "R1.3.2";
 constexpr char kBroker[] = "59.124.7.98";
 constexpr uint16_t kBrokerPort = 1883;
 constexpr uint32_t kWiFiAttemptTimeoutMs = 15000;
@@ -93,6 +93,8 @@ String mqttTopic;
 volatile bool otaInProgress = false;
 bool otaReady = false;
 String otaHostname;
+static_assert(sizeof(kOtaPassword) >= 13,
+              "kOtaPassword must contain at least 12 characters");
 #else
 constexpr bool otaInProgress = false;
 #endif
@@ -203,8 +205,7 @@ void switchWifiProfile(const char *reason) {
 void setupOta() {
   otaHostname = gatewayId();
   ArduinoOTA.setHostname(otaHostname.c_str());
-  // The router password remains in ignored include/secrets.h and is never published.
-  ArduinoOTA.setPassword(kRouterPassword);
+  ArduinoOTA.setPassword(kOtaPassword);
   ArduinoOTA.onStart([]() {
     otaInProgress = true;
     if (mqtt.connected()) mqtt.disconnect();
@@ -234,9 +235,16 @@ void setupOta() {
   ArduinoOTA.begin();
   otaReady = true;
   enqueueRgb(RgbSignal::OTA_READY);
-  Serial.printf("[S3_OTA] ready host=%s.local ip=%s sketch=%u free_ota=%u\n",
+  Serial.printf("[S3_OTA] ready host=%s.local ip=%s auth=enabled sketch=%u free_ota=%u\n",
                 otaHostname.c_str(), WiFi.localIP().toString().c_str(), ESP.getSketchSize(),
                 ESP.getFreeSketchSpace());
+}
+
+void stopOtaForWifiChange() {
+  if (!otaReady || otaInProgress) return;
+  ArduinoOTA.end();
+  otaReady = false;
+  Serial.println("[S3_OTA] stopped reason=wifi_disconnected");
 }
 
 void serviceOta() {
@@ -246,6 +254,7 @@ void serviceOta() {
 }
 #else
 void serviceOta() {}
+void stopOtaForWifiChange() {}
 #endif
 
 void serviceWiFi() {
@@ -267,6 +276,7 @@ void serviceWiFi() {
   if (wifiWasConnected) {
     Serial.printf("[S3_STA] disconnected profile=%s status=%d\n", connectedWifiAlias(),
                   WiFi.status());
+    stopOtaForWifiChange();
     wifiWasConnected = false;
     wifiConnecting = false;
     wifiProfileFailures = 0;

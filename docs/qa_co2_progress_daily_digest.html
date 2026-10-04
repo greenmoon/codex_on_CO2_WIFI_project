@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V46 2026.09.29 07:38</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V47 2026.10.04 14:37</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(048 2026-10-04 14:37) <b>Q:</b> ESP32-S3 是否已有可實際使用且具密碼保護的 A/B OTA？</summary>
+<p class="answer"><b>A:</b> 是。實機 partition table 已確認包含 <code>otadata</code>、6.25 MB <code>ota_0</code> 與 6.25 MB <code>ota_1</code>。Firmware <code>R1.3.2</code> 新增 <code>esp32-s3-remote-gateway-n16r8-ota-usb</code> 作首次 USB bootstrap，後續由 <code>esp32-s3-remote-gateway-n16r8-ota</code> 執行 authenticated network OTA；OTA 使用獨立且被 Git 排除的密碼，不再沿用 router 密碼，Wi-Fi profile 攜帶變更時會停止並重新建立 OTA/mDNS service。</p>
+<p><b>Evidence / next check：</b>baseline、USB OTA 與 network OTA 三種 N16R8 environment 均編譯成功。USB bootstrap 通過完整 SHA verification；第一次空密碼 OTA 被裝置正確拒絕，修正 PlatformIO post-script 後，對 IPHONE profile 的 <code>172.20.10.3</code> OTA 實測到 100%。Serial 完整出現 start、0–100% progress、end、reboot、<code>R1.3.2</code> 與再次 ready，重啟後 BLE 解碼 911 ppm 並恢復 MQTT publish。另觀察到一次 PHY calibration NVS <code>0x1105</code> 空間不足警告，但 Wi-Fi、BLE、MQTT、OTA 均持續運作；若後續每次開機重現，再評估經核准後做一次 NVS 清理。</p>
+</details>
 <details>
 <summary>(047 2026-09-29 07:38) <b>Q:</b> 任務完成時如何區分已完成結果與下一步？</summary>
 <p class="answer"><b>A:</b> 專案交接格式已改為固定兩行：綠色 <code>🟢 JB_DONE&gt;</code> 顯示已驗證完成的結果，藍色 <code>🔵 JB_NEXT&gt;</code> 顯示唯一且最有用的下一個動作；若沒有待辦，NEXT 顯示 <code>No pending task</code>。兩行固定依 DONE、NEXT 順序放在回覆最末端。</p>

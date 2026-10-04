@@ -11,6 +11,6 @@ constexpr char kS3HomeRouterPassword[] = "YOUR_HOME_PASSWORD";
 constexpr char kS3IphoneRouterSsid[] = "YOUR_IPHONE_HOTSPOT_SSID";
 constexpr char kS3IphoneRouterPassword[] = "YOUR_IPHONE_HOTSPOT_PASSWORD";
 
-// The firmware defaults to kRouterPassword when this optional constant is absent.
-// For better separation, uncomment and set a dedicated LAN-only OTA password.
-// constexpr char kOtaPassword[] = "YOUR_PRIVATE_OTA_PASSWORD";
+// Required only by CO2_ENABLE_OTA builds. Keep this different from Wi-Fi passwords.
+// The OTA uploader reads the same value locally; secrets.h remains ignored by Git.
+constexpr char kOtaPassword[] = "YOUR_PRIVATE_OTA_PASSWORD";

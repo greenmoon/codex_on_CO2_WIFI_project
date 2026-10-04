@@ -3,13 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V47 2026.10.04 14:37</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V49 2026.10.04 15:33</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(050 2026-10-04 15:33) <b>Q:</b> Global iPhone Dashboard 能否自動 PLAY 真實 CO₂ 曲線並無限循環？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.13</code> 已加入 Canvas CO₂ Live Curve：開頁預設自動 PLAY，只在通過 schema 2、device ID、sequence 與 sensor age 驗證的真實 MQTT payload 到達時新增資料點。曲線使用 60 點 circular buffer 顯示最近 10 分鐘，以低頻率 <code>requestAnimationFrame</code> 持續向 NOW 時間軸滾動，不產生模擬數值。</p>
+<p><b>Evidence / next check：</b>頁面已有大型 PLAY／PAUSE 觸控按鈕、點數與 ppm range；有新資料時曲線為綠色，payload stale 為黃色，WSS offline 為紅色。PAUSE 只凍結畫面，背景仍接收並保留最新 60 點；恢復 PLAY 後立即顯示最新視窗。Inline JavaScript 編譯、DOM ID 交叉檢查與 ESP32-C3 LittleFS <code>buildfs</code> 均通過；尚需從 iPhone Global URL 接收實際 WSS payload，驗證 10 分鐘長時間滾動與觸控。</p>
+</details>
+<details>
+<summary>(049 2026-10-04 15:12) <b>Q:</b> 如何修正專案內的版本不一致，並保留各元件的獨立版本線？</summary>
+<p class="answer"><b>A:</b> 以各元件的執行原始碼為 source of truth：ESP32-C3 firmware 與 local Dashboard 同步為 <code>V1.9.0</code>，補回 Stage 6 STA/MQTT 顯示；ESP32-S3 firmware 維持 <code>R1.3.2</code>，Global iPhone Dashboard 維持 <code>R1.3.12</code>，payload schema 維持 <code>2</code>。這些元件有不同發佈週期，因此不強制改成同一個版本號。</p>
+<p><b>Evidence / next check：</b><code>src/main.cpp</code> 宣告 <code>1.9.0</code>，<code>data/index.html</code> title、Stage line 與 footer 已同步為 <code>V1.9.0</code>，<code>data/app.js</code> 已顯示 firmware 現有的 STA/MQTT 欄位；<code>README.md</code> 與 <code>HANDOFF.md</code> 已加入目前版本表。Dropbox conflicted copies 已保留並移至 <code>archive/dropbox_conflicts/2026-09-15/</code>，排除後 <code>pio run -e esp32-c3-devkitm-1 -t buildfs</code> 已成功產生 LittleFS image；尚需將 LittleFS 燒錄至 ESP32-C3 後做實機 Dashboard 驗證。</p>
+</details>
 <details>
 <summary>(048 2026-10-04 14:37) <b>Q:</b> ESP32-S3 是否已有可實際使用且具密碼保護的 A/B OTA？</summary>
 <p class="answer"><b>A:</b> 是。實機 partition table 已確認包含 <code>otadata</code>、6.25 MB <code>ota_0</code> 與 6.25 MB <code>ota_1</code>。Firmware <code>R1.3.2</code> 新增 <code>esp32-s3-remote-gateway-n16r8-ota-usb</code> 作首次 USB bootstrap，後續由 <code>esp32-s3-remote-gateway-n16r8-ota</code> 執行 authenticated network OTA；OTA 使用獨立且被 Git 排除的密碼，不再沿用 router 密碼，Wi-Fi profile 攜帶變更時會停止並重新建立 OTA/mDNS service。</p>

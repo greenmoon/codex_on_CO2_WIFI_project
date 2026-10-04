@@ -2,6 +2,22 @@
 
 ESP32-C3 將 CO₂ 裝置的 BLE 資料轉送至本機 Wi-Fi AP，供 iPhone Dashboard 顯示。Stage 1 以模擬資料建立 Wi-Fi Dashboard；Stage 2 加入 BLE 被動掃描與原始封包觀察。
 
+## Current versions
+
+| Component | Version | Source of truth |
+|---|---:|---|
+| ESP32-C3 Gateway firmware | V1.9.0 | `src/main.cpp` |
+| ESP32-C3 local Dashboard | V1.9.0 | `data/index.html` |
+| ESP32-S3 remote Gateway firmware | R1.3.2 | `src/s3_remote_gateway.cpp` |
+| Global iPhone Dashboard | R1.3.13 | `index.html`, `data/remote_iphone_dashboard.html` |
+| MQTT payload schema | 2 | S3 payload and remote Dashboard validation |
+| MQTT/WSS interface | R1 | Remote Dashboard footer |
+| STA-only diagnostic firmware | STA_ONLY_V1.3 | `src/sta_only.cpp` |
+| STA+MQTT diagnostic firmware | STA_MQTT_TEST_V1.2 | `src/sta_mqtt_test.cpp` |
+| Windows MQTT Dashboard | V1.0.7 | `windows_bridge/dashboard/index.html` |
+
+Global Dashboard R1.3.13 預設自動 PLAY 最近 10 分鐘的真實 MQTT CO₂ 曲線；使用 60 點 circular buffer 避免長時間執行造成記憶體成長，並提供 PLAY／PAUSE 大型觸控按鈕。
+
 ## Stage 1
 
 - AP SSID：`CO2_WIFI`
@@ -68,10 +84,8 @@ V1.4.3 將 ESP32-C3 SoftAP gateway 與 Dashboard 由 `192.168.4.1` 改為 `192.1
 
 ## Stage 6
 
-V1.5.0 新增 Local MQTT Publisher：ESP32-C3 以 AP+STA 並行模式保留本地 Dashboard，同時連接 router 並將新 BLE 封包的 JSON telemetry 發布到 `59.124.7.96:1883`、topic `co2`。最短發布間隔 1000 ms，30 秒無新封包時發布 heartbeat；STA 與 MQTT 分別採 1–30 秒退避重連，不中斷 BLE 或本地 AP。Router 憑證儲存於已忽略的 `include/secrets.h`。
+V1.9.0 將真實 BLE decode、Router STA、MQTT broker 連線與 topic `co2` publish 整合到 ESP32-C3 Gateway。Local Dashboard 已同步為 V1.9.0，可顯示 STA IP、broker、topic、publish 次數與上次 publish 年齡。
 
-V1.5.1 修正 ESP32-C3 coexistence 啟動順序：先初始化 BLE controller，再啟動 Wi-Fi STA，避免 STA 已啟動後 `NimBLEDevice::init()` 在 `coex_core_enable` 觸發 abort/reboot loop。
+## Windows Stage 1 Bridge
 
-V1.5.2 將 BLE controller 移到所有 Wi-Fi 模式之前初始化：先 BLE scan，再啟動 AP+STA、Web Server 與 MQTT，解決特定 ESP32-C3 在 AP 已啟用後進入 `coex_core_enable` abort/reboot loop。
-
-V1.5.3 依 ESP32-C3 實機錯誤 <code>Should enable WiFi modem sleep when both WiFi and Bluetooth are enabled</code>，將 Wi-Fi modem sleep 改為啟用，保留 BLE+AP+STA coexistence 並避免 Wi-Fi driver abort。
+`windows_bridge.py` 實作 IDEA1：訂閱 Wi-Fi module gateway 發佈的 MQTT payload，再於 `:8080` 提供與 ESP32 相同的 `/health`、`/api/sensor` 與 `/ws` API。預設 broker 為 `59.124.7.96:1883`、topic 為 `co2`；可使用 `windows_bridge.example.env` 或啟動參數覆寫。Bridge 可接收已解碼 JSON 或含 `manufacturer_hex` 的原始 BLE JSON。Windows 專用 iPhone Dashboard 位於 `windows_bridge/dashboard/`，與 ESP32 共用的 `data/` 分離；V1.0.1 顯示 MQTT、Payload、Bridge、iPhone、Dashboard、Ready 六個狀態 LED，以及 iPhone 本機日期時間。Windows offline QR 可由 `python tools/generate_windows_qr.py` 產生；若 DHCP 位址改變，需重新產生 QR。

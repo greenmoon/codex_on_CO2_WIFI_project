@@ -1,6 +1,6 @@
 # CO2_WIFI Cross-Platform Handoff
 
-更新時間：2026-10-04 21:45（Asia/Taipei）
+更新時間：2026-10-04 21:50（Asia/Taipei）
 
 此文件用於從 MacBook 本機 Codex task 交接到 Windows 的新 Codex task。專案檔案由 Dropbox 同步；本機 chat、USB Serial Monitor、執行中的 bridge process 不會跨電腦同步。
 
@@ -8,7 +8,7 @@
 
 1. `AGENTS.md`：專案規則、QA 紀錄與完成交接格式。
 2. 本文件：目前已驗證狀態與下一步。
-3. `docs/qa_co2_progress_daily_digest.html`：完整工程決策與測試證據；最新為 QA V51、條目 052。
+3. `docs/qa_co2_progress_daily_digest.html`：完整工程決策與測試證據；最新為 QA V52、條目 053。
 
 Windows 新 Codex task 可先輸入：
 
@@ -24,7 +24,7 @@ Windows 新 Codex task 可先輸入：
 |---|---|---|
 | ESP32-C3 Gateway firmware / local Dashboard | V1.9.0，版本與 Stage 6 STA/MQTT UI 已同步 | `src/main.cpp`、`data/index.html`、`data/app.js` |
 | ESP32-S3 remote Gateway firmware | R1.3.2，已實測 authenticated A/B OTA、BLE decode 與 MQTT publish | `src/s3_remote_gateway.cpp`、QA 048 |
-| Global iPhone Dashboard | R1.3.14，payload schema 2，MQTT/WSS R1，Voice Alert 在 Live Curve 上方 | `index.html`、`data/remote_iphone_dashboard.html`、QA 052 |
+| Global iPhone Dashboard | R1.3.15，payload schema 2，MQTT/WSS R1，Live Curve 每筆資料有 dot | `index.html`、`data/remote_iphone_dashboard.html`、QA 053 |
 | Gateway 流程 | BLE advertising decode → Wi-Fi STA → MQTT publish `co2` | `src/main.cpp`、QA 049 |
 | STA+MQTT 隔離測試 | 每 5 秒 `{"f":N}` 連續 publish OK | `src/sta_mqtt_test.cpp`與已保留的 Serial 實測紀錄 |
 | Router 基準 | 2.4 GHz WPA2、固定 channel 6 的測試成功 | `include/secrets.example.h`與 Serial 實測紀錄 |

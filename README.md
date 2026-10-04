@@ -9,14 +9,14 @@ ESP32-C3 將 CO₂ 裝置的 BLE 資料轉送至本機 Wi-Fi AP，供 iPhone Das
 | ESP32-C3 Gateway firmware | V1.9.0 | `src/main.cpp` |
 | ESP32-C3 local Dashboard | V1.9.0 | `data/index.html` |
 | ESP32-S3 remote Gateway firmware | R1.3.2 | `src/s3_remote_gateway.cpp` |
-| Global iPhone Dashboard | R1.3.14 | `index.html`, `data/remote_iphone_dashboard.html` |
+| Global iPhone Dashboard | R1.3.15 | `index.html`, `data/remote_iphone_dashboard.html` |
 | MQTT payload schema | 2 | S3 payload and remote Dashboard validation |
 | MQTT/WSS interface | R1 | Remote Dashboard footer |
 | STA-only diagnostic firmware | STA_ONLY_V1.3 | `src/sta_only.cpp` |
 | STA+MQTT diagnostic firmware | STA_MQTT_TEST_V1.2 | `src/sta_mqtt_test.cpp` |
 | Windows MQTT Dashboard | V1.0.7 | `windows_bridge/dashboard/index.html` |
 
-Global Dashboard R1.3.14 將 CO₂ Voice Alert 移到 Live Curve 上方；Live Curve 維持預設自動 PLAY、最近 10 分鐘真實 MQTT 資料、60 點 circular buffer 與 PLAY／PAUSE 大型觸控按鈕。
+Global Dashboard R1.3.15 將 CO₂ Voice Alert 放在 Live Curve 上方；Live Curve 會在每一筆有效 MQTT 資料上畫出圓點，最新點使用較大標記與外圈，並維持 10 分鐘、60 點 circular buffer 與 PLAY／PAUSE。
 
 ## Stage 1
 

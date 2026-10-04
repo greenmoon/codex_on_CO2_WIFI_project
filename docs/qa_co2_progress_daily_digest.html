@@ -13,7 +13,7 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <details>
 <summary>(053 2026-10-04 21:50) <b>Q:</b> CO₂ Live Curve 能否在每一筆真實資料的曲線位置顯示 dot？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.15</code> 已為 10 分鐘 Live Curve 的每一筆有效 MQTT payload 畫出圓點；一般資料點半徑為 3 px，最新點為 5 px 並加上 9 px 半透明外圈，可一眼分辨歷史取樣點與最新讀值。圓點顏色仍跟隨 live 綠色、stale 黃色、WSS offline 紅色。</p>
-<p><b>Evidence / next check：</b>Canvas 繪圖邏輯在平滑曲線 <code>stroke()</code> 後遍歷 <code>trendPoints</code>，對每個 timestamp/ppm 轉換後的座標執行 <code>arc()</code>；維持原有 60 點 circular buffer，沒有新增假資料。發布後需在公開 Dashboard 收到至少兩筆 telemetry，進行 dot 視覺驗證。</p>
+<p><b>Evidence / next check：</b>Commit <code>bc8e8dd</code> 已推送公開 <code>main</code>；GitHub Pages 實際收到 3 筆真實 telemetry，顯示 402 ppm、<code>3 / 60</code>、<code>LIVE LOOP</code>，Canvas 可見最新圓點與半透明外圈。實測同時發現空資料提示被 CSS 覆寫而未隱藏，已補上 <code>.trend-empty[hidden]{display:none}</code>，避免有效曲線上仍顯示等待文字。</p>
 </details>
 <details>
 <summary>(052 2026-10-04 21:45) <b>Q:</b> iPhone Dashboard 能否將 CO₂ Voice Alert 與 Live Curve 的上下位置交換？</summary>

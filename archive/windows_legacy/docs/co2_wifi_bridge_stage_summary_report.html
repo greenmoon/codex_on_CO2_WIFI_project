@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CO₂ Wi-Fi Bridge Stage Summary Report V1.0 2026.09.14 14:17</title>
+<style>
+  :root{color:#16252a;background:#e9f0f1;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  *{box-sizing:border-box} body{margin:0}.sheet{width:min(100%,960px);min-height:1120px;margin:20px auto;padding:56px 64px 68px;background:#fff;box-shadow:0 12px 34px #30484a24;position:relative;page-break-after:always}.sheet:last-child{page-break-after:auto}
+  .eyebrow{margin:0;color:#007f83;font-size:12px;font-weight:800;letter-spacing:.15em}.title{margin:12px 0 8px;font-size:38px;line-height:1.08;letter-spacing:-.05em}.subtitle{margin:0;color:#617276;font-size:18px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0}.tag{border:1px solid #cce4e4;border-radius:99px;padding:4px 10px;background:#f3fbfb;color:#226063;font-size:12px;font-weight:700}
+  h2{margin:28px 0 10px;font-size:21px;letter-spacing:-.02em}h3{margin:0 0 7px;font-size:15px}p{margin:7px 0}code{padding:1px 4px;border-radius:4px;background:#eff3f4;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.9em}.lead{max-width:710px;font-size:18px;color:#3e5358}
+  .snapshot{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin:26px 0 30px;border:1px solid #d4e0e2;border-radius:14px;overflow:hidden;background:#d4e0e2}.snapshot div{padding:14px;background:#fbfdfd}.snapshot span{display:block;color:#708286;font-size:10px;font-weight:750;letter-spacing:.08em;text-transform:uppercase}.snapshot strong{display:block;margin-top:4px;font-size:23px;letter-spacing:-.04em}.snapshot small{display:block;color:#567075;font-size:11px}
+  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:9px;margin:17px 0}.node{min-height:106px;padding:14px;border:1px solid #c7d9db;border-radius:14px;background:#f9fcfc}.node strong{display:block;font-size:15px}.node span{display:block;margin-top:6px;color:#597176;font-size:12px}.arrow{align-self:center;color:#008f91;font-size:27px;font-weight:800}.good{border-color:#8bd3bc;background:#f0fcf6}.notice{border-color:#eed38b;background:#fffbed}.danger{border-color:#eab0ac;background:#fff4f3}
+  table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:13px}th,td{padding:10px;border:1px solid #d5e0e2;vertical-align:top;text-align:left}th{background:#edf6f7;color:#36575d;font-size:11px;letter-spacing:.04em;text-transform:uppercase}.status{font-weight:800}.status.ok{color:#087a4b}.status.plan{color:#9b6700}.status.note{color:#52676d}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{padding:18px;border:1px solid #d4e0e2;border-radius:14px;background:#fcfefe}.card ul{margin:8px 0 0;padding-left:19px}.card li{margin:5px 0}.callout{margin:18px 0;padding:14px 16px;border-left:4px solid #00a4a0;background:#effafa;color:#2f5457}.footer{position:absolute;bottom:28px;left:64px;right:64px;display:flex;justify-content:space-between;border-top:1px solid #d8e3e4;padding-top:10px;color:#718286;font-size:11px}.appendix-head{display:flex;gap:20px;align-items:center}.qr{width:148px;height:148px;padding:7px;border:1px solid #d6e2e3;border-radius:12px;background:white;object-fit:contain}.leds{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.led-card{padding:13px;border:1px solid #d5e1e2;border-radius:12px;background:#fcfefe}.lamp{display:inline-block;width:11px;height:11px;margin-right:6px;border-radius:50%;vertical-align:-1px}.green{background:#00aa85;box-shadow:0 0 0 4px #c9f0e4}.yellow{background:#e0a400;box-shadow:0 0 0 4px #fff0bd}.red{background:#df4c4c;box-shadow:0 0 0 4px #ffe0de}.led-card strong{font-size:13px}.led-card p{color:#576b70;font-size:12px}.small{color:#627479;font-size:12px}
+  @media(max-width:700px){.sheet{min-height:auto;margin:0;padding:34px 22px 62px}.title{font-size:30px}.snapshot{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr;gap:7px}.arrow{transform:rotate(90deg);justify-self:center}.two-col{grid-template-columns:1fr}.leds{grid-template-columns:1fr}.footer{left:22px;right:22px}}
+  @media print{body{background:#fff}.sheet{width:auto;min-height:100vh;margin:0;box-shadow:none;break-after:page}.sheet:last-child{break-after:auto}}
+</style>
+</head>
+<body>
+  <section class="sheet">
+    <p class="eyebrow">CO₂ WIFI PROJECT · STAGE SUMMARY</p>
+    <h1 class="title">CO₂ Wi‑Fi Bridge<br>階段摘要報告</h1>
+    <p class="subtitle">Stage Summary Report · V1.0 · 2026.09.14 14:17</p>
+    <div class="meta"><span class="tag">IDEA1 已驗證</span><span class="tag">MQTT → Windows → iPhone</span><span class="tag">JBSALES_07_5G</span><span class="tag">Page 1 / 3</span></div>
+    <p class="lead">本階段完成以 MQTT payload 為核心的 Windows Bridge，將 gateway 的 CO₂ 資料即時轉送到 iPhone Dashboard；同時保留 macOS 作為獨立的平行 Bridge 方案。兩個作業系統位於不同電腦與不同本機資料夾，不共用執行中的程式檔案。</p>
+
+    <div class="snapshot" aria-label="Live verification snapshot">
+      <div><span>MQTT Broker</span><strong>59.124.7.96</strong><small>Port 1883</small></div>
+      <div><span>Topic</span><strong>co2</strong><small>Fixed for this stage</small></div>
+      <div><span>Live CO₂</span><strong>417 ppm</strong><small>Snapshot 14:15</small></div>
+      <div><span>Bridge</span><strong>READY</strong><small>MQTT connected</small></div>
+      <div><span>iPhone</span><strong>1 WS</strong><small>Dashboard connected</small></div>
+    </div>
+
+    <h2>1. 已驗證資料路徑</h2>
+    <div class="flow" aria-label="Verified MQTT data path">
+      <div class="node good"><strong>CO₂ Sensor / BLE</strong><span>量測 CO₂、溫度、濕度、電池，經 Wi‑Fi module gateway 送出。</span></div><div class="arrow">→</div>
+      <div class="node good"><strong>MQTT Broker</strong><span><code>59.124.7.96:1883</code><br>topic <code>co2</code></span></div><div class="arrow">→</div>
+      <div class="node good"><strong>Windows Bridge</strong><span>訂閱、正規化 payload，經 HTTP/WebSocket 推送給 iPhone。</span></div>
+    </div>
+    <div class="flow" aria-label="Bridge to dashboard path">
+      <div class="node"><strong>Schema 5 Snapshot</strong><span>CO₂、溫濕度、電池、資料年齡、Bridge 與 MQTT 狀態。</span></div><div class="arrow">→</div>
+      <div class="node"><strong>WebSocket</strong><span><code>/ws</code> 即時推送；<code>/api/sensor</code> 供 REST 檢查。</span></div><div class="arrow">→</div>
+      <div class="node good"><strong>iPhone Dashboard</strong><span>顯示大 CO₂ 讀值、目前時間、六顆狀態 LED 與 payload age。</span></div>
+    </div>
+
+    <div class="callout"><b>本階段結論：</b>使用者已在 iPhone Dashboard 實際看到 CO₂ <code>442 ppm</code>；本報告建立時 Bridge 又取得 <code>417 ppm</code>、29.0°C、72%、電池 100% 的有效 MQTT snapshot。</div>
+    <div class="footer"><span>CO₂ Wi‑Fi Bridge Stage Summary Report V1.0</span><span>Page 1 / 3</span></div>
+  </section>
+
+  <section class="sheet">
+    <p class="eyebrow">SOLUTION ARCHITECTURE</p>
+    <h2>2. Windows 與 macOS Bridge 方案</h2>
+    <div class="two-col">
+      <article class="card">
+        <h3>Windows 方案 — 本階段實作與驗證</h3>
+        <p class="status ok">狀態：運行中</p>
+        <ul>
+          <li>程式：<code>windows_bridge.py</code></li>
+          <li>訂閱：MQTT broker <code>59.124.7.96</code>，topic <code>co2</code></li>
+          <li>服務：<code>/health</code>、<code>/api/sensor</code>、<code>/ws</code>，port <code>8080</code></li>
+          <li>Dashboard：獨立於 ESP32 的 <code>windows_bridge/dashboard/</code></li>
+          <li>iPhone URL：<code>http://192.168.1.3:8080/</code>；使用 offline QR 開啟</li>
+          <li>現場驗證：MQTT connected、Bridge READY、iPhone WebSocket 已連線。</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>macOS 方案 — 平行參考架構</h3>
+        <p class="status plan">狀態：設計／既有 home 環境流程</p>
+        <ul>
+          <li>流程：MQTT subscriber → macOS bridge → iPhone local Dashboard。</li>
+          <li>功能目標與 Windows 相同：接收 payload、產生 snapshot、以 WebSocket 推送。</li>
+          <li>macOS home 電腦與 Windows office 電腦各自維護同名但獨立資料夾。</li>
+          <li>建議 home 備份辨識名稱：<code>codex_on_CO2_WIFI_project_macos</code>。</li>
+          <li>此 Windows workspace 不修改或執行 macOS 的程式與資料。</li>
+        </ul>
+      </article>
+    </div>
+
+    <h2>3. Payload 與 Bridge 行為</h2>
+    <table>
+      <thead><tr><th>層級</th><th>輸入／輸出</th><th>處理內容</th><th>目前狀態</th></tr></thead>
+      <tbody>
+        <tr><td>Gateway → MQTT</td><td>已解碼 sensor JSON，或含 <code>manufacturer_hex</code> 的原始 JSON</td><td>Wi‑Fi module / gateway 發佈 CO₂ payload</td><td class="status ok">已收實際資料</td></tr>
+        <tr><td>MQTT → Bridge</td><td><code>co2_ppm</code>、<code>temperature_c</code>、<code>humidity_pct</code>、<code>battery_pct</code></td><td>Windows 先讀取扁平欄位；無 CO₂ 時可解碼 0x0969 / 15-byte manufacturer payload</td><td class="status ok">已驗證</td></tr>
+        <tr><td>Bridge → Dashboard</td><td>Schema 5 JSON</td><td>加入 MQTT connection、message counter、payload age、Bridge READY 與 WebSocket client 計數</td><td class="status ok">已驗證</td></tr>
+        <tr><td>Dashboard → iPhone</td><td>HTML / CSS / JavaScript</td><td>版本化資源及 <code>no-store</code> 回應，避免 iPhone 使用舊 LED 邏輯快取</td><td class="status ok">已驗證</td></tr>
+      </tbody>
+    </table>
+
+    <h2>4. 營運與隔離原則</h2>
+    <div class="two-col">
+      <div class="card"><h3>Windows office</h3><p>使用 <code>codex_on_CO2_WIFI_project</code>，對同一 SSID <code>JBSALES_07_5G</code> 提供 <code>192.168.1.3:8080</code>。IP 若經 DHCP 改變，重新產生 Windows Dashboard QR。</p></div>
+      <div class="card"><h3>macOS home</h3><p>維持獨立 local folder 與本機 Bridge。若需要建立明確備份識別，先停止同步風險來源後，再另存為 <code>codex_on_CO2_WIFI_project_macos</code>。</p></div>
+    </div>
+    <p class="small">限制：此報告僅記錄 Windows 現場可驗證結果與 macOS 平行方案說明；未在本 Windows 電腦執行 macOS Bridge 或 BLE 實體測試。</p>
+    <div class="footer"><span>CO₂ Wi‑Fi Bridge Stage Summary Report V1.0</span><span>Page 2 / 3</span></div>
+  </section>
+
+  <section class="sheet">
+    <p class="eyebrow">APPENDIX · IPHONE DASHBOARD</p>
+    <div class="appendix-head">
+      <div><h2>Appendix A. iPhone Dashboard 使用方式</h2><p>iPhone 連上與 Windows Bridge 相同的 Wi‑Fi 後，掃描 offline QR，開啟 Dashboard。若畫面未更新，重新整理頁面即可載入目前版本。</p><p><code>http://192.168.1.3:8080/</code></p></div>
+      <img class="qr" src="../offline_qr/windows_mqtt_dashboard.svg" alt="Windows MQTT dashboard offline QR code">
+    </div>
+
+    <h2>Appendix B. 六顆 LED 定義</h2>
+    <div class="leds">
+      <article class="led-card"><h3>MQTT</h3><p><span class="lamp green"></span><b>綠：</b>Bridge 已連線 broker。<br><span class="lamp yellow"></span><b>黃：</b>短暫 WebSocket recovery。<br><span class="lamp red"></span><b>紅：</b>超過 30 秒未恢復。</p></article>
+      <article class="led-card"><h3>PAYLOAD</h3><p><span class="lamp green"></span><b>綠色呼吸：</b>收到有效 fresh MQTT payload。<br><span class="lamp yellow"></span><b>黃：</b>資料延遲或 recovery。<br><span class="lamp red"></span><b>紅：</b>資料無效或已逾時。</p></article>
+      <article class="led-card"><h3>BRIDGE</h3><p><span class="lamp green"></span><b>綠：</b>Bridge READY 且 payload 有效。<br><span class="lamp yellow"></span><b>黃：</b>等待復原。<br><span class="lamp red"></span><b>紅：</b>Bridge／資料鏈路已逾時。</p></article>
+      <article class="led-card"><h3>IPHONE</h3><p><span class="lamp green"></span><b>綠：</b>Bridge 看見 WebSocket client。<br><span class="lamp yellow"></span><b>黃：</b>WebSocket 正在重連。<br><span class="lamp red"></span><b>紅：</b>重連超過 30 秒。</p></article>
+      <article class="led-card"><h3>DASHBOARD</h3><p><span class="lamp green"></span><b>綠：</b>WebSocket 即時連線。<br><span class="lamp yellow"></span><b>黃：</b>短暫斷線，顯示 <code>RECOVERING</code>。<br><span class="lamp red"></span><b>紅：</b>顯示 <code>OFFLINE</code>。</p></article>
+      <article class="led-card"><h3>READY</h3><p><span class="lamp green"></span><b>綠：</b>MQTT → iPhone 資料鏈路 ready。<br><span class="lamp yellow"></span><b>黃：</b>等待重連或資料更新。<br><span class="lamp red"></span><b>紅：</b>有效資料超過 30 秒未恢復。</p></article>
+    </div>
+
+    <h2>Appendix C. 現行版本與交付物</h2>
+    <table>
+      <thead><tr><th>項目</th><th>版本／位置</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>Windows Bridge</td><td><code>windows_bridge.py</code></td><td>MQTT subscriber、payload 正規化、HTTP/WebSocket server</td></tr>
+        <tr><td>iPhone Dashboard</td><td>V1.0.7 · <code>windows_bridge/dashboard/</code></td><td>CO₂ 顯示、六顆 LED、復原緩衝、PAYLOAD 呼吸</td></tr>
+        <tr><td>Offline QR</td><td><code>offline_qr/windows_mqtt_dashboard.svg</code></td><td>iPhone 掃描開啟 Windows Dashboard</td></tr>
+        <tr><td>QA 日誌</td><td><code>docs/qa_co2_progress_daily_digest.html</code></td><td>每日問題、答案、驗證證據</td></tr>
+      </tbody>
+    </table>
+    <div class="footer"><span>CO₂ Wi‑Fi Bridge Stage Summary Report V1.0</span><span>Page 3 / 3</span></div>
+  </section>
+</body>
+</html>

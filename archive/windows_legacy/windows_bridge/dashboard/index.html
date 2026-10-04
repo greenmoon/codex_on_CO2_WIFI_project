@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f7">
+  <title>Windows MQTT CO₂ Dashboard V1.0.7 2026.09.14 14:06</title>
+  <link rel="stylesheet" href="dashboard.css?v=1.0.7">
+</head>
+<body>
+  <main class="page">
+    <header class="bridge-header">
+      <span class="bridge-dot" aria-hidden="true"></span>
+      <p>WINDOWS MQTT BRIDGE · V1.0.7</p>
+      <strong id="connection-state">CONNECTING</strong>
+    </header>
+
+    <p class="datetime"><span>LOCAL TIME</span><time id="current-time">----</time></p>
+
+    <section class="led-panel" aria-label="Bridge and dashboard status LEDs">
+      <div><i id="led-mqtt" class="led waiting"></i><span>MQTT</span></div>
+      <div><i id="led-payload" class="led waiting"></i><span>PAYLOAD</span></div>
+      <div><i id="led-bridge" class="led waiting"></i><span>BRIDGE</span></div>
+      <div><i id="led-iphone" class="led waiting"></i><span>IPHONE</span></div>
+      <div><i id="led-dashboard" class="led waiting"></i><span>DASHBOARD</span></div>
+      <div><i id="led-ready" class="led waiting"></i><span>READY</span></div>
+    </section>
+
+    <section class="sensor-card" aria-label="Live CO2 sensor reading">
+      <div class="reading-rule"></div>
+      <p class="reading-label">CO₂ CONCENTRATION</p>
+      <div class="reading"><strong id="co2">---</strong><span>ppm CO₂</span></div>
+      <p id="quality" class="quality">等待 MQTT payload</p>
+
+      <div class="metrics">
+        <article><strong id="temperature">--.-</strong><span>°C</span><small>Temperature</small><i id="temperature-bar"></i></article>
+        <article><strong id="humidity">--</strong><span>%</span><small>Humidity</small><i id="humidity-bar"></i></article>
+        <article><strong id="battery">---</strong><span>%</span><small>Battery</small><i id="battery-bar"></i></article>
+      </div>
+
+      <div id="ready-state" class="ready-state">MQTT → iPhone WAITING</div>
+    </section>
+
+    <section class="bridge-details" aria-label="Windows bridge status">
+      <div><span>Network</span><strong id="network-name">---</strong></div>
+      <div><span>MQTT topic</span><strong id="mqtt-topic">---</strong></div>
+      <div><span>Messages</span><strong id="mqtt-messages">0</strong></div>
+      <div><span>Payload age</span><strong id="payload-age">---</strong></div>
+    </section>
+  </main>
+  <script src="dashboard.js?v=1.0.7"></script>
+</body>
+</html>

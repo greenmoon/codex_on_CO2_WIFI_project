@@ -29,4 +29,4 @@ Manufacturer Data 前兩個 byte `69 09` 對應 little-endian Company ID `0x0969
 
 ## 跨平台提示
 
-上述 `/dev/cu.usbmodem101` 是本次 macOS 捕獲的歷史證據，不是跨平台固定值。新的測試請使用實際 serial port：macOS 通常為 `/dev/cu.usbmodem*`，Windows 通常為 `COMx`；平台操作參考 `platform/macos/README.md` 與 `platform/windows/README.md`。
+上述 `/dev/cu.usbmodem101` 是本次 macOS 捕獲的歷史證據，不是固定值。新的測試請使用實際 serial port；macOS 通常為 `/dev/cu.usbmodem*`，操作方式參考 `docs/macos_setup.md`。

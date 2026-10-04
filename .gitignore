@@ -1,5 +1,7 @@
 .pio/
 .venv/
 .DS_Store
+__pycache__/
+*.pyc
 include/secrets.h
 logs/**/*.log

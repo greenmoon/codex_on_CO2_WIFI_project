@@ -14,7 +14,6 @@ ESP32-C3 將 CO₂ 裝置的 BLE 資料轉送至本機 Wi-Fi AP，供 iPhone Das
 | MQTT/WSS interface | R1 | Remote Dashboard footer |
 | STA-only diagnostic firmware | STA_ONLY_V1.3 | `src/sta_only.cpp` |
 | STA+MQTT diagnostic firmware | STA_MQTT_TEST_V1.2 | `src/sta_mqtt_test.cpp` |
-| Windows MQTT Dashboard | V1.0.7 | `windows_bridge/dashboard/index.html` |
 
 Global Dashboard R1.3.15 將 CO₂ Voice Alert 放在 Live Curve 上方；Live Curve 會在每一筆有效 MQTT 資料上畫出圓點，最新點使用較大標記與外圈，並維持 10 分鐘、60 點 circular buffer 與 PLAY／PAUSE。
 
@@ -86,6 +85,12 @@ V1.4.3 將 ESP32-C3 SoftAP gateway 與 Dashboard 由 `192.168.4.1` 改為 `192.1
 
 V1.9.0 將真實 BLE decode、Router STA、MQTT broker 連線與 topic `co2` publish 整合到 ESP32-C3 Gateway。Local Dashboard 已同步為 V1.9.0，可顯示 STA IP、broker、topic、publish 次數與上次 publish 年齡。
 
-## Windows Stage 1 Bridge
+## macOS 本機診斷工具
 
-`windows_bridge.py` 實作 IDEA1：訂閱 Wi-Fi module gateway 發佈的 MQTT payload，再於 `:8080` 提供與 ESP32 相同的 `/health`、`/api/sensor` 與 `/ws` API。預設 broker 為 `59.124.7.96:1883`、topic 為 `co2`；可使用 `windows_bridge.example.env` 或啟動參數覆寫。Bridge 可接收已解碼 JSON 或含 `manufacturer_hex` 的原始 BLE JSON。Windows 專用 iPhone Dashboard 位於 `windows_bridge/dashboard/`，與 ESP32 共用的 `data/` 分離；V1.0.1 顯示 MQTT、Payload、Bridge、iPhone、Dashboard、Ready 六個狀態 LED，以及 iPhone 本機日期時間。Windows offline QR 可由 `python tools/generate_windows_qr.py` 產生；若 DHCP 位址改變，需重新產生 QR。
+目前 active tools 採單層 macOS 結構：
+
+```zsh
+./tools/start_mqtt_bridge.command
+```
+
+`tools/mqtt_bridge.py` 訂閱 MQTT topic `co2`，並在 `:8080` 提供 `/api/co2`、本機 Dashboard 與 Global Dashboard QR。操作說明位於 `docs/macos_setup.md`。Windows 舊實作已移至 `archive/windows_legacy/`，不屬於 active runtime。

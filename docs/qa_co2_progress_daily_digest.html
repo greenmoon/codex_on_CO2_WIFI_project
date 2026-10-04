@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V52 2026.10.04 21:50</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V53 2026.10.04 22:15</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(054 2026-10-04 22:15) <b>Q:</b> 專案能否移除 Windows/macOS/current 多層資料夾，改成簡單的 macOS active layout 而不改變現有功能？</summary>
+<p class="answer"><b>A:</b> Active layout 已扁平化：正式 bridge 與 launcher 位於 <code>tools/mqtt_bridge.py</code>、<code>tools/start_mqtt_bridge.command</code>，macOS 說明位於 <code>docs/macos_setup.md</code>，logs 使用單一 <code>logs/</code>，QR 只保留 <code>offline_qr/global/</code>。舊 Windows 實作與舊本機 QR 均移入 <code>archive/</code>，沒有永久刪除可追溯資料。</p>
+<p><b>Evidence / next check：</b>Python AST、zsh launcher syntax、project-root、Global QR 路徑、active-directory absence 與 LittleFS <code>buildfs</code> 均通過。實際以原指令 <code>./tools/start_mqtt_bridge.command</code> 啟動後，<code>/api/co2</code>、<code>/iphone_qr.png</code>、<code>/iphone_dashboard.html</code> 均回傳 HTTP 200，完成後已停止 bridge。公開 <code>index.html</code> 視覺確認仍為 Dashboard R1.3.15，收到真實 402 ppm、HOME -47 dBm、<code>LIVE LOOP</code>，畫面與 Global QR 未受資料夾重整影響。</p>
+</details>
 <details>
 <summary>(053 2026-10-04 21:50) <b>Q:</b> CO₂ Live Curve 能否在每一筆真實資料的曲線位置顯示 dot？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.15</code> 已為 10 分鐘 Live Curve 的每一筆有效 MQTT payload 畫出圓點；一般資料點半徑為 3 px，最新點為 5 px 並加上 9 px 半透明外圈，可一眼分辨歷史取樣點與最新讀值。圓點顏色仍跟隨 live 綠色、stale 黃色、WSS offline 紅色。</p>

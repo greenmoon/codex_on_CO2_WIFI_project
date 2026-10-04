@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V54 2026.10.04 22:28</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V55 2026.10.04 22:35</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(056 2026-10-04 22:35) <b>Q:</b> Dashboard 頂端時鐘能否加入年月日，顯示完整日期時間？</summary>
+<p class="answer"><b>A:</b> Global Dashboard 已更新為 <code>R1.3.17</code>，頂端固定顯示本機 <code>yyyy-MM-dd HH:mm:ss</code>，例如 <code>2026-10-04 22:36:12</code>。年、月、日與 24 小時制時間均由裝置本機 clock 取得，每秒更新。</p>
+<p><b>Evidence / next check：</b>日期與時間各欄位均以兩位數補零；WSS、telemetry validation、Voice Alert 與 Live Curve 邏輯未修改。完成 JavaScript、LittleFS 與版本一致性檢查後，需 GI 推送並確認公開頁面完整格式。</p>
+</details>
 <details>
 <summary>(055 2026-10-04 22:28) <b>Q:</b> Dashboard 頂端時間能否由「PM 10:26」改為 24 小時制並顯示秒數？</summary>
 <p class="answer"><b>A:</b> Global Dashboard 已更新為 <code>R1.3.16</code>，頂端時鐘固定輸出本機時間 <code>HH:mm:ss</code>，例如 <code>22:26:12</code>；不再依賴 locale 的 AM／PM 文字。時鐘仍每秒更新一次，不影響 WSS、telemetry、Voice Alert 或 Live Curve。</p>

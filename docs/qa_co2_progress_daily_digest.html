@@ -13,7 +13,7 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <details>
 <summary>(052 2026-10-04 21:45) <b>Q:</b> iPhone Dashboard 能否將 CO₂ Voice Alert 與 Live Curve 的上下位置交換？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.14</code> 已將 <code>CO₂ Voice Alert</code> 移到 <code>CO₂ Live Curve</code> 上方，方便使用者先操作語音 ON／OFF 與即時播報，再查看 10 分鐘真實 CO₂ 曲線。本次只交換 HTML 區塊順序，不改變 WSS、payload validation、語音規則、circular buffer 或 PLAY／PAUSE 邏輯。</p>
-<p><b>Evidence / next check：</b>Local HTML 源碼的 voice section 已位於 trend section 之前，版本標記與 cache-busting query 已同步為 <code>R1.3.14</code>。發布後需在 GitHub Pages DOM 驗證兩個 heading 的實際順序，並確認真實 WSS telemetry 仍會更新曲線。</p>
+<p><b>Evidence / next check：</b>Commit <code>7165943</code> 已推送至公開 <code>main</code>，GitHub Pages title 為 <code>CO₂ Remote WSS Dashboard R1.3.14</code>；實際 DOM sections 順序為 <code>voice-card → trend-card → share</code>，Voice top 約 465 px、Curve top 約 847 px。公開頁面同時收到真實 402 ppm，Live Curve 保持 <code>LIVE LOOP</code>，footer 顯示 <code>FW R1.3.2 · Dashboard R1.3.14 · Payload Schema 2 · MQTT/WSS R1</code>。</p>
 </details>
 <details>
 <summary>(051 2026-10-04 15:50) <b>Q:</b> Dashboard R1.3.13 是否已在 GitHub Pages 以真實 WSS telemetry 驗證 PLAY／PAUSE？</summary>

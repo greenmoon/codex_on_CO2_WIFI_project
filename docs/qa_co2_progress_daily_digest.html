@@ -13,7 +13,7 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <details>
 <summary>(055 2026-10-04 22:28) <b>Q:</b> Dashboard 頂端時間能否由「PM 10:26」改為 24 小時制並顯示秒數？</summary>
 <p class="answer"><b>A:</b> Global Dashboard 已更新為 <code>R1.3.16</code>，頂端時鐘固定輸出本機時間 <code>HH:mm:ss</code>，例如 <code>22:26:12</code>；不再依賴 locale 的 AM／PM 文字。時鐘仍每秒更新一次，不影響 WSS、telemetry、Voice Alert 或 Live Curve。</p>
-<p><b>Evidence / next check：</b>新版使用 <code>getHours()</code>、<code>getMinutes()</code>、<code>getSeconds()</code> 與兩位數補零組合時間。完成 JavaScript、LittleFS 與版本一致性檢查後，需 GI 推送並在公開頁面確認實際格式。</p>
+<p><b>Evidence / next check：</b>Commit <code>b456beb</code> 已推送至公開 <code>main</code>；JavaScript、LittleFS 與版本一致性檢查通過。GitHub Pages 實測時鐘由 <code>22:30:25</code> 更新至 <code>22:30:37</code>，確認 24 小時制與秒數持續更新；同頁收到真實 402 ppm、HOME -47 dBm、<code>LIVE LOOP</code>，footer 顯示 <code>FW R1.3.2 · Dashboard R1.3.16 · Payload Schema 2 · MQTT/WSS R1</code>。</p>
 </details>
 <details>
 <summary>(054 2026-10-04 22:15) <b>Q:</b> 專案能否移除 Windows/macOS/current 多層資料夾，改成簡單的 macOS active layout 而不改變現有功能？</summary>

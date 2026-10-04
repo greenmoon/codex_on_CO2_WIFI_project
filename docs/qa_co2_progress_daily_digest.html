@@ -13,7 +13,7 @@ body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-
 <details>
 <summary>(056 2026-10-04 22:35) <b>Q:</b> Dashboard 頂端時鐘能否加入年月日，顯示完整日期時間？</summary>
 <p class="answer"><b>A:</b> Global Dashboard 已更新為 <code>R1.3.17</code>，頂端固定顯示本機 <code>yyyy-MM-dd HH:mm:ss</code>，例如 <code>2026-10-04 22:36:12</code>。年、月、日與 24 小時制時間均由裝置本機 clock 取得，每秒更新。</p>
-<p><b>Evidence / next check：</b>日期與時間各欄位均以兩位數補零；WSS、telemetry validation、Voice Alert 與 Live Curve 邏輯未修改。完成 JavaScript、LittleFS 與版本一致性檢查後，需 GI 推送並確認公開頁面完整格式。</p>
+<p><b>Evidence / next check：</b>Commit <code>d75ca01</code> 已推送公開 <code>main</code>；JavaScript、LittleFS 與版本一致性檢查通過。GitHub Pages 實測由 <code>2026-10-04 22:38:07</code> 更新至 <code>2026-10-04 22:38:16</code>，完整格式與秒數更新正常；同頁收到真實 402 ppm、HOME -54 dBm、<code>LIVE LOOP</code>，footer 顯示 <code>FW R1.3.2 · Dashboard R1.3.17 · Payload Schema 2 · MQTT/WSS R1</code>。</p>
 </details>
 <details>
 <summary>(055 2026-10-04 22:28) <b>Q:</b> Dashboard 頂端時間能否由「PM 10:26」改為 24 小時制並顯示秒數？</summary>

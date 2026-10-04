@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V50 2026.10.04 15:50</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V51 2026.10.04 21:45</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(052 2026-10-04 21:45) <b>Q:</b> iPhone Dashboard 能否將 CO₂ Voice Alert 與 Live Curve 的上下位置交換？</summary>
+<p class="answer"><b>A:</b> Dashboard <code>R1.3.14</code> 已將 <code>CO₂ Voice Alert</code> 移到 <code>CO₂ Live Curve</code> 上方，方便使用者先操作語音 ON／OFF 與即時播報，再查看 10 分鐘真實 CO₂ 曲線。本次只交換 HTML 區塊順序，不改變 WSS、payload validation、語音規則、circular buffer 或 PLAY／PAUSE 邏輯。</p>
+<p><b>Evidence / next check：</b>Local HTML 源碼的 voice section 已位於 trend section 之前，版本標記與 cache-busting query 已同步為 <code>R1.3.14</code>。發布後需在 GitHub Pages DOM 驗證兩個 heading 的實際順序，並確認真實 WSS telemetry 仍會更新曲線。</p>
+</details>
 <details>
 <summary>(051 2026-10-04 15:50) <b>Q:</b> Dashboard R1.3.13 是否已在 GitHub Pages 以真實 WSS telemetry 驗證 PLAY／PAUSE？</summary>
 <p class="answer"><b>A:</b> 是。Commit <code>61ddecf</code> 已推送至公開 <code>main</code>，GitHub Pages Global Index 與 Remote Dashboard 均已回傳 <code>R1.3.13</code>。公開頁面實際收到 ESP32-S3 telemetry，顯示 865 ppm、Live Curve <code>1 / 60</code>、<code>LIVE LOOP</code>，footer 為 <code>FW R1.3.2 · Dashboard R1.3.13 · Payload Schema 2 · MQTT/WSS R1</code>。</p>

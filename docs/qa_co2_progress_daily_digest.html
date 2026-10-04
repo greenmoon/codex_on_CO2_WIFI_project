@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CO2_WIFI Project QA Progress Daily Digest V49 2026.10.04 15:33</title>
+<title>CO2_WIFI Project QA Progress Daily Digest V50 2026.10.04 15:50</title>
 <style>
 body{max-width:980px;margin:32px auto;padding:0 18px;font-family:system-ui,sans-serif;line-height:1.55;color:#183047;background:#f7fafc}h1{font-size:24px}details{background:#fff;border:1px solid #ccd8e2;border-radius:10px;padding:12px;margin:12px 0}summary{font-weight:700;cursor:pointer}.answer{color:#17633b}.flow{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;overflow-x:auto;margin:16px 0}.lane{min-width:140px;border:1px solid #bdd0df;border-radius:10px;padding:10px;background:#edf6ff}.lane h3{font-size:14px;margin:0 0 10px;text-align:center}.step{border-radius:8px;padding:8px;margin:8px 0;font-size:13px}.normal{background:#dceeff;border:1px solid #1976d2}.robust{background:#d9f7e5;border:2px solid #16864b}.warning{background:#fff1b8;border:2px solid #d48806}.critical{background:#ffd6d6;border:2px solid #c62828}.legend{font-size:13px;color:#52687a}code{background:#eef2f5;padding:1px 4px;border-radius:4px}footer{margin-top:28px;color:#607486;font-size:13px}
 </style>
 </head>
 <body>
 <h1>CO2_WIFI Project — QA Progress Daily Digest</h1>
+<details>
+<summary>(051 2026-10-04 15:50) <b>Q:</b> Dashboard R1.3.13 是否已在 GitHub Pages 以真實 WSS telemetry 驗證 PLAY／PAUSE？</summary>
+<p class="answer"><b>A:</b> 是。Commit <code>61ddecf</code> 已推送至公開 <code>main</code>，GitHub Pages Global Index 與 Remote Dashboard 均已回傳 <code>R1.3.13</code>。公開頁面實際收到 ESP32-S3 telemetry，顯示 865 ppm、Live Curve <code>1 / 60</code>、<code>LIVE LOOP</code>，footer 為 <code>FW R1.3.2 · Dashboard R1.3.13 · Payload Schema 2 · MQTT/WSS R1</code>。</p>
+<p><b>Evidence / next check：</b>公開 URL 的 PAUSE 實測後 <code>trend-state=PAUSED</code>、<code>pause aria-pressed=true</code>；再按 PLAY 後恢復 <code>trend-state=LIVE LOOP</code>、<code>play aria-pressed=true</code>，瀏覽器 console 無 error/warning。下一步只需在 iPhone 上進行 10 分鐘長時間觀察，確認曲線累積、畫面滾動與觸控手感。</p>
+</details>
 <details>
 <summary>(050 2026-10-04 15:33) <b>Q:</b> Global iPhone Dashboard 能否自動 PLAY 真實 CO₂ 曲線並無限循環？</summary>
 <p class="answer"><b>A:</b> Dashboard <code>R1.3.13</code> 已加入 Canvas CO₂ Live Curve：開頁預設自動 PLAY，只在通過 schema 2、device ID、sequence 與 sensor age 驗證的真實 MQTT payload 到達時新增資料點。曲線使用 60 點 circular buffer 顯示最近 10 分鐘，以低頻率 <code>requestAnimationFrame</code> 持續向 NOW 時間軸滾動，不產生模擬數值。</p>

@@ -1,8 +1,8 @@
 # CO2_WIFI macOS Handoff
 
-更新時間：2026-10-04 22:15（Asia/Taipei）
+更新時間：2026-10-04 22:28（Asia/Taipei）
 
-此 repository 目前以 macOS 為主要開發與操作環境。開始工作前先讀取 `AGENTS.md`、本文件與 `docs/qa_co2_progress_daily_digest.html`；QA 最新為 V53、條目 054。
+此 repository 目前以 macOS 為主要開發與操作環境。開始工作前先讀取 `AGENTS.md`、本文件與 `docs/qa_co2_progress_daily_digest.html`；QA 最新為 V54、條目 055。
 
 ## 已驗證版本
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | ESP32-C3 Gateway / local Dashboard | V1.9.0 | `src/main.cpp`、`data/index.html` |
 | ESP32-S3 remote Gateway | R1.3.2，BLE decode、Wi-Fi/MQTT 與 OTA 已驗證 | `src/s3_remote_gateway.cpp` |
-| Global iPhone Dashboard | R1.3.15，Voice Alert、10 分鐘 Live Curve 與 sample dots | `index.html`、`data/remote_iphone_dashboard.html` |
+| Global iPhone Dashboard | R1.3.16，24 小時秒數時鐘、Voice Alert、10 分鐘 Live Curve 與 sample dots | `index.html`、`data/remote_iphone_dashboard.html` |
 | MQTT payload | Schema 2 / MQTT-WSS R1 | S3 firmware 與 Global Dashboard |
 
 ## 現行資料路徑
